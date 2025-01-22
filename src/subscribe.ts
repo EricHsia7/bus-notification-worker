@@ -9,7 +9,7 @@ export async function subscribe(request, env, ctx) {
   const param_scheduled_time = url_params.get('scheduled_time');
   const param_secret = url_params.get('secret');
 
-  const subscription_id = generateIdentifier();
+  let subscription_id = '';
 
   let status = 'unknown';
   let message = 'Unknown errors';
@@ -24,6 +24,7 @@ export async function subscribe(request, env, ctx) {
       scheduled_time: scheduled_time,
       secret: param_secret
     };
+    subscription_id = generateIdentifier();
     await env.bus_notification_kv.put(subscription_id, JSON.stringify(object));
     status = 'successful';
     message = 'The notification has been subscribed.';

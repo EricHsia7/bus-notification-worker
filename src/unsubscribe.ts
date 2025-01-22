@@ -36,7 +36,7 @@ export async function unsubscribe(request, env, ctx) {
     });
     if (delta === null) {
       status = 'error';
-      message = 'Authorization error';
+      message = `Authorization error (${delta})`;
     } else {
       await env.bus_notification_kv.delete(subscription_id);
       status = 'successful';
