@@ -27,7 +27,7 @@ export default {
             status: 'error',
             message: 'Unsupported method.'
           }),
-          { headers: { 'Content-Type': 'application/json' } }
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
         );
         break;
     }

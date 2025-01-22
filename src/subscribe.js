@@ -27,6 +27,7 @@ export async function subscribe(request, env, ctx) {
   // if (keys.indexOf(subscription_id) < 0) {
   const now = new Date();
   const scheduled_time = new Date(param_scheduled_time);
+  console.log(scheduled_time);
   if (scheduled_time.getTime() >= now.getTime() + 60 * 5 * 1000) {
     const object = {
       token: param_telegram_token,
@@ -49,6 +50,6 @@ export async function subscribe(request, env, ctx) {
       status: status,
       message: message
     }),
-    { headers: { 'Content-Type': 'application/json' } }
+    { status: 200, headers: { 'Content-Type': 'application/json' } }
   );
 }
