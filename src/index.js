@@ -1,3 +1,6 @@
+import { subscribe } from './subscribe';
+import { unsubscribe } from './unsubscribe';
+
 // Export a default object containing event handlers
 export default {
   // The fetch handler is invoked when this worker receives a HTTP(S) request
@@ -5,29 +8,25 @@ export default {
   async fetch(request, env, ctx) {
     // You'll find it helpful to parse the request.url string into a URL object. Learn more at https://developer.mozilla.org/en-US/docs/Web/API/URL
     const url = new URL(request.url);
+    const url_params = url.searchParams;
+    const param_method = url_params.get('method');
 
-
-    // You can get pretty far with simple logic like if/switch-statements
-    switch (url.pathname) {
-      case '/redirect':
-        return "1"
-
-
-      case '/proxy':
-        return "2"
+    switch (param_method) {
+      case 'subscribe':
+        subscribe(request, env, ctx);
+        break;
+      case 'unsubscribe':
+        unsubscribe(request, env, ctx);
+        break;
+      default:
+        return new Response(
+          JSON.stringify({
+            status: 'error',
+            message: 'Unsupported method.'
+          }),
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+        break;
     }
-
-
-    if (url.pathname.startsWith('/api/')) {
-      // You can also use more robust routing
-      return apiRouter.handle(request);
-    }
-
-
-		
-		return new Response(
-			`test`,
-			{ headers: { "Content-Type": "text/html" } }
-		);
-  },
+  }
 };
