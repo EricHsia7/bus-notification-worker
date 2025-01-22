@@ -13,10 +13,10 @@ export default {
 
     switch (param_method) {
       case 'subscribe':
-        subscribe(request, env, ctx);
+       return  subscribe(request, env, ctx);
         break;
       case 'unsubscribe':
-        unsubscribe(request, env, ctx);
+      return  unsubscribe(request, env, ctx);
         break;
       default:
         return new Response(
