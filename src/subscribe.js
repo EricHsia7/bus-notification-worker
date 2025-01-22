@@ -15,7 +15,7 @@ export async function subscribe(request, env, ctx) {
   const param_telegram_token = url_params.get('token');
   const param_telegram_chat_id = url_params.get('chat_id');
   const param_telegram_text = url_params.get('text');
-  const param_scheduled_time = url.get('scheduled_time');
+  const param_scheduled_time = url_params.get('scheduled_time');
   const param_secret = url_params.get('secret');
 
   const subscription_id = generateIdentifier();
