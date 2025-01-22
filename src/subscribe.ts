@@ -36,7 +36,7 @@ export async function subscribe(request, env, ctx) {
       scheduled_time: scheduled_time,
       secret: param_secret
     };
-    await env.BUS_NOTIFICATION_KV.put(subscription_id, JSON.stringify(object));
+    await env.bus_notification_kv.put(subscription_id, JSON.stringify(object));
     status = 'successful';
     message = 'The notification has been subscribed.';
   } else {

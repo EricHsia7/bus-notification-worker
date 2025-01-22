@@ -2,6 +2,10 @@ import { send } from './send';
 import { subscribe } from './subscribe';
 import { unsubscribe } from './unsubscribe';
 
+interface Env {
+  bus_notification_kv: KVNamespace;
+}
+
 // Export a default object containing event handlers
 export default {
   // The fetch handler is invoked when this worker receives a HTTP(S) request
