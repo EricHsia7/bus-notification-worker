@@ -1,4 +1,4 @@
-import { OTPAuth } from './tools';
+import * as OTPAuth from 'otpauth';
 
 export async function unsubscribe(request, env, ctx) {
   const url = new URL(request.url);
@@ -15,7 +15,7 @@ export async function unsubscribe(request, env, ctx) {
       // Provider or service the account is associated with.
       issuer: 'BusNotification',
       // Account identifier.
-      label: param_subscription_id,
+      label: String(param_subscription_id),
       // Algorithm used for the HMAC function, possible values are:
       //   "SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
       //   "SHA3-224", "SHA3-256", "SHA3-384" and "SHA3-512".
@@ -26,7 +26,7 @@ export async function unsubscribe(request, env, ctx) {
       period: 30,
       // Arbitrary key encoded in base32 or `OTPAuth.Secret` instance
       // (if omitted, a cryptographically secure random secret is generated).
-      secret: object.secret
+      secret: String(object.secret)
       //   or: `OTPAuth.Secret.fromBase32("US3WHSG7X5KAPV27VANWKQHF3SH3HULL")`
       //   or: `new OTPAuth.Secret()`
     });
@@ -38,7 +38,7 @@ export async function unsubscribe(request, env, ctx) {
       status = 'error';
       message = `Authorization error (${delta})`;
     } else {
-      await env.bus_notification_kv.delete(subscription_id);
+      await env.bus_notification_kv.delete(param_subscription_id);
       status = 'successful';
       message = 'The notification has been unsubscribed.';
     }

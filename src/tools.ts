@@ -9,6 +9,3 @@ export function generateIdentifier(prefix = 'bus') {
   return result;
 }
 
-export const OTPAuth = await import('otpauth');
-
-// import * as OTPAuth from "otpauth";
