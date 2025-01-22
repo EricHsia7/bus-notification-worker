@@ -6,8 +6,8 @@ export async function unsubscribe(request, env, ctx) {
   const param_subscription_id = url_params.get('subscription_id');
   const param_totp_token = url_params.get('totp_token');
 
-  let status = 'unknown';
-  let message = 'Unknown errors';
+  let result = 'unknown';
+  let message = 'unknown';
 
   const json = await env.bus_notification_kv.get(param_subscription_id);
   if (json) {
@@ -25,21 +25,21 @@ export async function unsubscribe(request, env, ctx) {
       window: 1
     });
     if (delta === null) {
-      status = 'error';
-      message = `Authorization error (${delta})`;
+      result = 'error';
+      message = `An error occurs when authorizing.`;
     } else {
       await env.bus_notification_kv.delete(param_subscription_id);
-      status = 'successful';
+      result = 'successful';
       message = 'The notification has been unsubscribed.';
     }
   } else {
-    status = 'error';
+    result = 'error';
     message = 'The subscription was not found.';
   }
 
   return new Response(
     JSON.stringify({
-      status: status,
+      result: result,
       message: message
     }),
     {

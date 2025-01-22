@@ -11,8 +11,8 @@ export async function subscribe(request, env, ctx) {
 
   let subscription_id = '';
 
-  let status = 'unknown';
-  let message = 'Unknown errors';
+  let result = 'unknown';
+  let message = 'unknown';
 
   const now = new Date();
   const scheduled_time = new Date(param_scheduled_time);
@@ -26,16 +26,16 @@ export async function subscribe(request, env, ctx) {
     };
     subscription_id = generateIdentifier();
     await env.bus_notification_kv.put(subscription_id, JSON.stringify(object));
-    status = 'successful';
+    result = 'successful';
     message = 'The notification has been subscribed.';
   } else {
-    status = 'error';
+    result = 'error';
     message = 'Scheduled time shall be at least 5 minutes after inclusively.';
   }
 
   return new Response(
     JSON.stringify({
-      status: status,
+      result: result,
       message: message,
       subscription_id: subscription_id
     }),

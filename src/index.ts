@@ -29,9 +29,14 @@ export default {
         return new Response(
           JSON.stringify({
             status: 'error',
-            message: 'Unsupported method.'
+            message: `The method '${param_method}' is unsupported.`
           }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
+          {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
         );
         break;
     }
