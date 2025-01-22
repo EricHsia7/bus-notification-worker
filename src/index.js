@@ -1,3 +1,4 @@
+import { send } from './send';
 import { subscribe } from './subscribe';
 import { unsubscribe } from './unsubscribe';
 
@@ -13,10 +14,10 @@ export default {
 
     switch (param_method) {
       case 'subscribe':
-       return  subscribe(request, env, ctx);
+        return await subscribe(request, env, ctx);
         break;
       case 'unsubscribe':
-      return  unsubscribe(request, env, ctx);
+        return await unsubscribe(request, env, ctx);
         break;
       default:
         return new Response(
@@ -28,5 +29,8 @@ export default {
         );
         break;
     }
+  },
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(send(event, env, ctx));
   }
 };

@@ -5,8 +5,8 @@
   "workers_dev": false,
   "kv_namespaces": [
     {
-      "binding": "queue",
-      "id": "9f0c1dab51944e1599afb4b5e2ba7765"
+      "binding": "bus-notification-kv",
+      "id": "2e08137deed542e795f8cd76a0270d82"
     }
   ]
 }
