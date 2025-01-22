@@ -14,10 +14,12 @@ export default {
 
     switch (param_method) {
       case 'subscribe':
-        return await subscribe(request, env, ctx);
+        const subscription = await subscribe(request, env, ctx);
+        return subscription;
         break;
       case 'unsubscribe':
-        return await unsubscribe(request, env, ctx);
+        const unsubscription = await unsubscribe(request, env, ctx);
+        return unsubscription;
         break;
       default:
         return new Response(
