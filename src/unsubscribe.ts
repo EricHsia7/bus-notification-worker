@@ -9,13 +9,14 @@ export async function unsubscribe(request, env, ctx) {
   let status = 'unknown';
   let message = 'Unknown errors';
 
-  const object = await env.bus_notification_kv.get(param_subscription_id);
-  if (object) {
+  const json = await env.bus_notification_kv.get(param_subscription_id);
+  if (json) {
+    const object = JSON.parse(json);
     let totp = new OTPAuth.TOTP({
       // Provider or service the account is associated with.
       issuer: 'BusNotification',
       // Account identifier.
-      label: String(param_subscription_id),
+      label: param_subscription_id,
       // Algorithm used for the HMAC function, possible values are:
       //   "SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
       //   "SHA3-224", "SHA3-256", "SHA3-384" and "SHA3-512".
@@ -26,12 +27,12 @@ export async function unsubscribe(request, env, ctx) {
       period: 30,
       // Arbitrary key encoded in base32 or `OTPAuth.Secret` instance
       // (if omitted, a cryptographically secure random secret is generated).
-      secret: String(object.secret)
+      secret: object.secret
       //   or: `OTPAuth.Secret.fromBase32("US3WHSG7X5KAPV27VANWKQHF3SH3HULL")`
       //   or: `new OTPAuth.Secret()`
     });
     let delta = totp.validate({
-      token: param_totp_token,
+      token: String(param_totp_token),
       window: 1
     });
     if (delta === null) {
