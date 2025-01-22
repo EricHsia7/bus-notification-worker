@@ -1,13 +1,4 @@
-function generateIdentifier(prefix = 'bus') {
-  const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-  let result = `${prefix}_`;
-  const length = 32;
-  for (let i = 0; i < length; i++) {
-    const randomNumber = Math.round(Math.random() * characterSet.length);
-    result += characterSet.substring(randomNumber, randomNumber + 1);
-  }
-  return result;
-}
+import { generateIdentifier } from './tools';
 
 export async function subscribe(request, env, ctx) {
   const url = new URL(request.url);
@@ -23,11 +14,8 @@ export async function subscribe(request, env, ctx) {
   let status = 'unknown';
   let message = 'Unknown errors';
 
-  // const keys = await env.BUS_NOTIFICATION_KV.list({ prefix: 'bus_' });
-  // if (keys.indexOf(subscription_id) < 0) {
   const now = new Date();
   const scheduled_time = new Date(param_scheduled_time);
-  console.log(scheduled_time);
   if (scheduled_time.getTime() >= now.getTime() + 60 * 5 * 1000) {
     const object = {
       token: param_telegram_token,
@@ -43,13 +31,18 @@ export async function subscribe(request, env, ctx) {
     status = 'error';
     message = 'Scheduled time shall be at least 5 minutes after inclusively.';
   }
-  // }
 
   return new Response(
     JSON.stringify({
       status: status,
-      message: message
+      message: message,
+      subscription_id: subscription_id
     }),
-    { status: 200, headers: { 'Content-Type': 'application/json' } }
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
   );
 }

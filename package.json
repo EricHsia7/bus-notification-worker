@@ -16,5 +16,7 @@
   "devDependencies": {
     "wrangler": "^3.103.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "otpauth": "^9.3.6"
+  }
 }
