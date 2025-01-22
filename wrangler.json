@@ -1,0 +1,12 @@
+{
+  "name": "Bus Notification Worker",
+  "main": "./src/index.js",
+  "compatibility_date": "2022-07-12",
+  "workers_dev": false,
+  "kv_namespaces": [
+    {
+      "binding": "queue",
+      "id": "queue"
+    }
+  ]
+}
