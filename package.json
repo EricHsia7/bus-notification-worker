@@ -1,1 +1,20 @@
-3.103.2
+{
+  "name": "@erichsia7/bus-notification-worker",
+  "version": "0.0.1",
+  "description": "",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EricHsia7/bus-notification-worker.git"
+  },
+  "keywords": ["bus-notification-worker"],
+  "author": "EricHsia7",
+  "bugs": {
+    "url": "https://github.com/erichsia7/bus-notification-worker/issues"
+  },
+  "homepage": "https://erichsia7.github.io/bus-notification-worker/",
+  "devDependencies": {
+    "wrangler": "^3.103.2"
+  },
+  "dependencies": {}
+}
