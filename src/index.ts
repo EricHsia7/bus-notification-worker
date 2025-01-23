@@ -1,3 +1,4 @@
+import { cancel } from './cancel';
 import { register } from './register';
 import { schedule } from './schedule';
 import { send } from './send';
@@ -9,10 +10,8 @@ interface Env {
 
 // Export a default object containing event handlers
 export default {
-  // The fetch handler is invoked when this worker receives a HTTP(S) request
-  // and should return a Response (optionally wrapped in a Promise)
+  // The fetch handler is invoked when this worker receives a HTTP(S) request and should return a Response (optionally wrapped in a Promise)
   async fetch(request, env, ctx) {
-    // You'll find it helpful to parse the request.url string into a URL object. Learn more at https://developer.mozilla.org/en-US/docs/Web/API/URL
     const url = new URL(request.url);
     const url_params = url.searchParams;
     const param_method = url_params.get('method');
@@ -25,6 +24,11 @@ export default {
       case 'schedule':
         const scheduling = await schedule(request, env, ctx);
         return scheduling;
+        break;
+      case 'cancel':
+        const cancellation = await cancel(request, env, ctx);
+        return cancellation;
+        break;
         break;
       case 'update':
         const update = await updateTelegram(request, env, ctx);
