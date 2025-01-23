@@ -20,8 +20,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
   const now = new Date();
   const scheduleID = generateIdentifier('schedule');
 
-  let status = 500;
-  let responseObject = { result: 'There was an unknown error.' };
+  let responseObject = { result: 'There was an unknown error.', code: 500 };
 
   const clientIDTest = /^(client_)([A-Za-z0-9_-]{32,32})$/gm.test(paramClientID);
   const clientJSON = await env.bus_notification_kv.get(paramClientID);
@@ -37,25 +36,22 @@ export async function schedule(request, env, ctx): Promise<Response> {
           scheduled_time: paramScheduledTime
         };
         await env.bus_notification_kv.put(scheduleID, JSON.stringify(scheduleObject));
-        status = 200;
         responseObject = {
-          result: 'successful',
-          schedule_id: scheduleID
+          result: 'The message was scheduled.',
+          schedule_id: scheduleID,
+          code: 200
         };
       } else {
-        status = 400;
-        responseObject = { result: 'The scheduled time shall be at least 5 minutes after.' };
+        responseObject = { result: 'The scheduled time shall be at least 5 minutes after.', code: 400 };
       }
     } else {
-      status = 401;
-      responseObject = { result: `The request was unauthorized.` };
+      responseObject = { result: 'The request was unauthorized.', code: 401 };
     }
   } else {
-    status = 404;
-    responseObject = { result: 'The client was not found.' };
+    responseObject = { result: 'The client was not found.', code: 404 };
   }
   return new Response(JSON.stringify(responseObject), {
-    status,
+    status: 200,
     headers: headers
   });
 }

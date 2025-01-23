@@ -43,10 +43,16 @@ export default {
         break;
         break;
       default:
-        return new Response(`The method '${param_method}' is unsupported.`, {
-          status: 400,
-          headers: headers
-        });
+        return new Response(
+          JSON.stringify({
+            result: `The method '${param_method}' is unsupported.`,
+            code: 400
+          }),
+          {
+            status: 200,
+            headers: headers
+          }
+        );
         break;
     }
   },

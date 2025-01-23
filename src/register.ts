@@ -20,8 +20,7 @@ export async function register(request, env, ctx): Promise<Response> {
   const clientID = generateIdentifier('client');
   const TOTPSecret = OTPAuthSecret(24);
 
-  let status = 500;
-  let responseObject = { result: 'There was an unknown error.' };
+  let responseObject = { result: 'There was an unknown error.', code: 500 };
 
   const telegramBotTokenValidation = await checkTelegramBotToken(paramTelegramToken);
   if (telegramBotTokenValidation) {
@@ -34,17 +33,16 @@ export async function register(request, env, ctx): Promise<Response> {
     };
     await env.bus_notification_kv.put(clientID, JSON.stringify(clientObject));
     responseObject = {
-      result: 'successful',
+      result: 'Client was registered.',
       client_id: clientID,
-      secret: TOTPSecret
+      secret: TOTPSecret,
+      code: 200
     };
-    status = 200;
   } else {
-    responseObject = { result: 'The token is not valid.' };
-    status = 400;
+    responseObject = { result: 'The token is not valid.', code: 400 };
   }
   return new Response(JSON.stringify(responseObject), {
-    status,
+    status: 200,
     headers: headers
   });
 }
