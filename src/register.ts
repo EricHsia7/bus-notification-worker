@@ -1,3 +1,4 @@
+import { checkTelegramBotToken } from './telegram';
 import { generateIdentifier, OTPAuthSecret } from './tools';
 
 export interface Client {
