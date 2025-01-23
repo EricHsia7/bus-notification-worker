@@ -38,7 +38,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
         await env.bus_notification_kv.put(scheduleID, JSON.stringify(scheduleObject));
         status = 200;
         responseObject = {
-          result: 'The message was scheduled successfully.',
+          result: 'successful',
           schedule_id: scheduleID
         };
       } else {
