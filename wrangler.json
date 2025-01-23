@@ -8,5 +8,9 @@
       "binding": "bus_notification_kv",
       "id": "c15c7c2744104f51bf9e35b12aa55148"
     }
-  ]
+  ],
+
+  "triggers": {
+    "crons": ["*/3 * * * *"]
+  }
 }

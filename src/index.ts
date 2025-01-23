@@ -1,8 +1,6 @@
 import { register } from './register';
 import { schedule } from './schedule';
 import { send } from './send';
-import { subscribe } from './subscribe';
-import { unsubscribe } from './unsubscribe';
 
 interface Env {
   bus_notification_kv: KVNamespace;
@@ -26,14 +24,6 @@ export default {
       case 'schedule':
         const scheduling = await schedule(request, env, ctx);
         return scheduling;
-        break;
-      case 'subscribe':
-        const subscription = await subscribe(request, env, ctx);
-        return subscription;
-        break;
-      case 'unsubscribe':
-        const unsubscription = await unsubscribe(request, env, ctx);
-        return unsubscription;
         break;
       default:
         return new Response(`The method '${param_method}' is unsupported.`, {

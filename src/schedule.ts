@@ -20,7 +20,8 @@ export async function schedule(request, env, ctx) {
   const scheduleID = generateIdentifier('schedule');
 
   let status = 500;
-  let responseObject = { result: 'unknown error' };
+  let responseObject = { result: 'There was an unknown error.' };
+  
   const clientIDTest = /^(client_)([A-Za-z0-9_-]{32,32})$/gm.test(paramClientID);
   const clientJSON = await env.bus_notification_kv.get(paramClientID);
   if (clientIDTest && clientJSON) {
@@ -46,7 +47,7 @@ export async function schedule(request, env, ctx) {
       }
     } else {
       status = 401;
-      responseObject = { result: 'Unauthorized request.' };
+      responseObject = { result: `The request is unauthorized.` };
     }
   } else {
     status = 404;

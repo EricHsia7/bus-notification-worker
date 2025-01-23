@@ -20,7 +20,7 @@ export async function register(request, env, ctx) {
   const TOTPSecret = OTPAuthSecret(24);
 
   let status = 500;
-  let responseObject = { result: 'unknown error' };
+  let responseObject = { result: 'There was an unknown error.' };
 
   const telegramBotTokenValidation = await checkTelegramBotToken(paramTelegramToken);
   if (telegramBotTokenValidation) {
@@ -39,7 +39,7 @@ export async function register(request, env, ctx) {
     };
     status = 200;
   } else {
-    responseObject = { result: 'error' };
+    responseObject = { result: 'The token is not valid.' };
     status = 400;
   }
   return new Response(JSON.stringify(responseObject), {
