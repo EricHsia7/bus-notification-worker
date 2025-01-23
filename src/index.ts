@@ -1,4 +1,5 @@
 import { register } from './register';
+import { schedule } from './schedule';
 import { send } from './send';
 import { subscribe } from './subscribe';
 import { unsubscribe } from './unsubscribe';
@@ -21,6 +22,10 @@ export default {
       case 'register':
         const registration = await register(request, env, ctx);
         return registration;
+        break;
+      case 'schedule':
+        const scheduling = await schedule(request, env, ctx);
+        return scheduling;
         break;
       case 'subscribe':
         const subscription = await subscribe(request, env, ctx);
