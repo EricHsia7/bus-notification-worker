@@ -31,18 +31,12 @@ export default {
         return unsubscription;
         break;
       default:
-        return new Response(
-          JSON.stringify({
-            status: 'error',
-            message: `The method '${param_method}' is unsupported.`
-          }),
-          {
-            status: 200,
-            headers: {
-              'Content-Type': 'application/json'
-            }
+        return new Response(`The method '${param_method}' is unsupported.`, {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json'
           }
-        );
+        });
         break;
     }
   },
