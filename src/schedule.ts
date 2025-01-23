@@ -49,4 +49,10 @@ export async function schedule(request, env, ctx) {
     status = 404;
     responseText = 'The client was not found.';
   }
+  return new Response(responseText, {
+    status,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
 }
