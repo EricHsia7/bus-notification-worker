@@ -1,3 +1,4 @@
+import { register } from './register';
 import { send } from './send';
 import { subscribe } from './subscribe';
 import { unsubscribe } from './unsubscribe';
@@ -17,6 +18,10 @@ export default {
     const param_method = url_params.get('method');
 
     switch (param_method) {
+      case 'register':
+        const registration = await register(request, env, ctx);
+        return registration;
+        break;
       case 'subscribe':
         const subscription = await subscribe(request, env, ctx);
         return subscription;
