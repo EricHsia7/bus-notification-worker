@@ -9,7 +9,7 @@ export interface Client {
   type: 'client';
 }
 
-export async function register(request, env, ctx) {
+export async function register(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
   const urlParams = url.searchParams;
 
@@ -24,14 +24,14 @@ export async function register(request, env, ctx) {
 
   const telegramBotTokenValidation = await checkTelegramBotToken(paramTelegramToken);
   if (telegramBotTokenValidation) {
-    const client: Client = {
+    const clientObject: Client = {
       token: paramTelegramToken,
       chat_id: parseInt(paramTelegramChatID),
       secret: TOTPSecret,
       client_id: clientID,
       type: 'client'
     };
-    await env.bus_notification_kv.put(clientID, JSON.stringify(client));
+    await env.bus_notification_kv.put(clientID, JSON.stringify(clientObject));
     responseObject = {
       result: 'successful',
       client_id: clientID,

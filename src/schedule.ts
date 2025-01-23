@@ -7,7 +7,7 @@ export interface Schedule {
   scheduled_time: string;
 }
 
-export async function schedule(request, env, ctx) {
+export async function schedule(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
   const urlParams = url.searchParams;
 
@@ -30,12 +30,12 @@ export async function schedule(request, env, ctx) {
     if (validation) {
       const scheduledTime = new Date(paramScheduledTime);
       if (scheduledTime.getTime() >= now.getTime() + 60 * 5 * 1000) {
-        const schedule: Schedule = {
+        const scheduleObject: Schedule = {
           client_id: paramClientID,
           message: paramMessage,
           scheduled_time: paramScheduledTime
         };
-        await env.bus_notification_kv.put(scheduleID, JSON.stringify(schedule));
+        await env.bus_notification_kv.put(scheduleID, JSON.stringify(scheduleObject));
         status = 200;
         responseObject = {
           result: 'The message was scheduled successfully.',
@@ -47,7 +47,7 @@ export async function schedule(request, env, ctx) {
       }
     } else {
       status = 401;
-      responseObject = { result: `The request is unauthorized.` };
+      responseObject = { result: `The request was unauthorized.` };
     }
   } else {
     status = 404;

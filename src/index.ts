@@ -1,6 +1,7 @@
 import { register } from './register';
 import { schedule } from './schedule';
 import { send } from './send';
+import { updateTelegram } from './update_telegram';
 
 interface Env {
   bus_notification_kv: KVNamespace;
@@ -24,6 +25,11 @@ export default {
       case 'schedule':
         const scheduling = await schedule(request, env, ctx);
         return scheduling;
+        break;
+      case 'update':
+        const update = await updateTelegram(request, env, ctx);
+        return update;
+        break;
         break;
       default:
         return new Response(`The method '${param_method}' is unsupported.`, {
