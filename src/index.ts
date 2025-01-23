@@ -2,7 +2,7 @@ import { cancel } from './cancel';
 import { register } from './register';
 import { schedule } from './schedule';
 import { send } from './send';
-import { update } from './update_telegram';
+import { update } from './update';
 
 interface Env {
   bus_notification_kv: KVNamespace;
