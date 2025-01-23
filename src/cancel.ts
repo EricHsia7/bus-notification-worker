@@ -1,4 +1,4 @@
-import { headers } from '.';
+import { headers, ResponseObjectCancel } from '.';
 import { Client } from './register';
 import { Schedule } from './schedule';
 import { generateIdentifier, OTPAuthValidate } from './tools';
@@ -14,7 +14,11 @@ export async function cancel(request, env, ctx): Promise<Response> {
   const now = new Date();
   const scheduleID = generateIdentifier('schedule');
 
-  let responseObject = { result: 'There was an unknown error.', code: 500 };
+  let responseObject: ResponseObjectCancel = {
+    result: 'There was an unknown error.',
+    code: 500,
+    method: 'cancel'
+  };
 
   const clientIDTest = /^(client_)([A-Za-z0-9_-]{32,32})$/gm.test(paramClientID);
   const clientJSON = await env.bus_notification_kv.get(paramClientID);
@@ -28,18 +32,38 @@ export async function cancel(request, env, ctx): Promise<Response> {
         const scheduledTime = new Date(scheduleObject.scheduled_time);
         if (scheduledTime.getTime() < now.getTime()) {
           await env.bus_notification_kv.delete(scheduleID);
-          responseObject = { result: 'The schedule was canceled successfully.', code: 200 };
+          responseObject = {
+            result: 'The schedule was canceled successfully.',
+            code: 200,
+            method: 'cancel'
+          };
         } else {
-          responseObject = { result: 'The schedule can only be canceled before it was due.', code: 400 };
+          responseObject = {
+            result: 'The schedule can only be canceled before it was due.',
+            code: 400,
+            method: 'cancel'
+          };
         }
       } else {
-        responseObject = { result: 'The schedule was not found.', code: 404 };
+        responseObject = {
+          result: 'The schedule was not found.',
+          code: 404,
+          method: 'cancel'
+        };
       }
     } else {
-      responseObject = { result: `The request was unauthorized.`, code: 401 };
+      responseObject = {
+        result: `The request was unauthorized.`,
+        code: 401,
+        method: 'cancel'
+      };
     }
   } else {
-    responseObject = { result: 'The client was not found.', code: 404 };
+    responseObject = {
+      result: 'The client was not found.',
+      code: 404,
+      method: 'cancel'
+    };
   }
   return new Response(JSON.stringify(responseObject), {
     status: 200,

@@ -1,4 +1,4 @@
-import { headers } from '.';
+import { headers, ResponseObjectRegister } from '.';
 import { checkTelegramBotToken } from './telegram';
 import { generateIdentifier, OTPAuthSecret } from './tools';
 
@@ -20,7 +20,13 @@ export async function register(request, env, ctx): Promise<Response> {
   const clientID = generateIdentifier('client');
   const TOTPSecret = OTPAuthSecret(24);
 
-  let responseObject = { result: 'There was an unknown error.', code: 500 };
+  let responseObject: ResponseObjectRegister = {
+    result: 'There was an unknown error.',
+    code: 500,
+    method: 'register',
+    client_id: 'null',
+    secret: 'null'
+  };
 
   const telegramBotTokenValidation = await checkTelegramBotToken(paramTelegramToken);
   if (telegramBotTokenValidation) {
@@ -34,12 +40,19 @@ export async function register(request, env, ctx): Promise<Response> {
     await env.bus_notification_kv.put(clientID, JSON.stringify(clientObject));
     responseObject = {
       result: 'Client was registered.',
+      code: 200,
+      method: 'register',
       client_id: clientID,
-      secret: TOTPSecret,
-      code: 200
+      secret: TOTPSecret
     };
   } else {
-    responseObject = { result: 'The token is not valid.', code: 400 };
+    responseObject = {
+      result: 'The token is not valid.',
+      code: 400,
+      method: 'register',
+      client_id: 'null',
+      secret: 'null'
+    };
   }
   return new Response(JSON.stringify(responseObject), {
     status: 200,

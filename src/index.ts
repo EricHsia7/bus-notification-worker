@@ -2,11 +2,43 @@ import { cancel } from './cancel';
 import { register } from './register';
 import { schedule } from './schedule';
 import { send } from './send';
-import { updateTelegram } from './update_telegram';
+import { update } from './update_telegram';
 
 interface Env {
   bus_notification_kv: KVNamespace;
 }
+
+export type methodType = 'cancel' | 'register' | 'schedule' | 'update';
+export type responseCode = 200 | 400 | 401 | 404 | 500;
+
+export interface ResponseObjectCancel {
+  result: string;
+  code: responseCode;
+  method: 'cancel';
+}
+
+export interface ResponseObjectRegister {
+  result: string;
+  code: responseCode;
+  method: 'register';
+  client_id: string | 'null';
+  secret: string | 'null';
+}
+
+export interface ResponseObjectSchedule {
+  result: string;
+  code: responseCode;
+  method: 'schedule';
+  schedule_id: string | 'null';
+}
+
+export interface ResponseObjectUpdate {
+  result: string;
+  code: responseCode;
+  method: 'update';
+}
+
+export type ResponseObject = ResponseObjectCancel | ResponseObjectRegister | ResponseObjectSchedule | ResponseObjectUpdate;
 
 export const headers = {
   'Content-Type': 'application/json',
@@ -36,17 +68,16 @@ export default {
         const cancellation = await cancel(request, env, ctx);
         return cancellation;
         break;
-        break;
       case 'update':
-        const update = await updateTelegram(request, env, ctx);
-        return update;
-        break;
+        const updating = await update(request, env, ctx);
+        return updating;
         break;
       default:
         return new Response(
           JSON.stringify({
             result: `The method '${param_method}' is unsupported.`,
-            code: 400
+            code: 400,
+            method: param_method
           }),
           {
             status: 200,

@@ -1,4 +1,4 @@
-import { headers } from '.';
+import { headers, ResponseObjectSchedule } from '.';
 import { Client } from './register';
 import { generateIdentifier, OTPAuthValidate } from './tools';
 
@@ -20,7 +20,12 @@ export async function schedule(request, env, ctx): Promise<Response> {
   const now = new Date();
   const scheduleID = generateIdentifier('schedule');
 
-  let responseObject = { result: 'There was an unknown error.', code: 500 };
+  let responseObject: ResponseObjectSchedule = {
+    result: 'There was an unknown error.',
+    code: 500,
+    method: 'schedule',
+    schedule_id: 'null'
+  };
 
   const clientIDTest = /^(client_)([A-Za-z0-9_-]{32,32})$/gm.test(paramClientID);
   const clientJSON = await env.bus_notification_kv.get(paramClientID);
@@ -38,17 +43,33 @@ export async function schedule(request, env, ctx): Promise<Response> {
         await env.bus_notification_kv.put(scheduleID, JSON.stringify(scheduleObject));
         responseObject = {
           result: 'The message was scheduled.',
-          schedule_id: scheduleID,
-          code: 200
+          code: 200,
+          method: 'schedule',
+          schedule_id: scheduleID
         };
       } else {
-        responseObject = { result: 'The scheduled time shall be at least 5 minutes after.', code: 400 };
+        responseObject = {
+          result: 'The scheduled time shall be at least 5 minutes after.',
+          code: 400,
+          method: 'schedule',
+          schedule_id: 'null'
+        };
       }
     } else {
-      responseObject = { result: 'The request was unauthorized.', code: 401 };
+      responseObject = {
+        result: 'The request was unauthorized.',
+        code: 401,
+        method: 'schedule',
+        schedule_id: 'null'
+      };
     }
   } else {
-    responseObject = { result: 'The client was not found.', code: 404 };
+    responseObject = {
+      result: 'The client was not found.',
+      code: 404,
+      method: 'schedule',
+      schedule_id: 'null'
+    };
   }
   return new Response(JSON.stringify(responseObject), {
     status: 200,

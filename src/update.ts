@@ -1,8 +1,9 @@
+import { ResponseObjectUpdate } from '.';
 import { Client } from './register';
 import { checkTelegramBotToken } from './telegram';
 import { OTPAuthValidate } from './tools';
 
-export async function updateTelegram(request, env, ctx): Promise<Response> {
+export async function update(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
   const urlParams = url.searchParams;
 
@@ -11,8 +12,11 @@ export async function updateTelegram(request, env, ctx): Promise<Response> {
   const paramTelegramToken = urlParams.get('token') as string;
   const paramTelegramChatID = urlParams.get('chat_id') as string;
 
-  let status = 500;
-  let responseObject = { result: 'There was an unknown error.' };
+  let responseObject: ResponseObjectUpdate = {
+    result: 'There was an unknown error.',
+    code: 500,
+    method: 'update'
+  };
 
   const clientIDTest = /^(client_)([A-Za-z0-9_-]{32,32})$/gm.test(paramClientID);
   const clientJSON = await env.bus_notification_kv.get(paramClientID);
@@ -30,22 +34,34 @@ export async function updateTelegram(request, env, ctx): Promise<Response> {
           type: 'client'
         };
         await env.bus_notification_kv.put(paramClientID, JSON.stringify(newClientObject));
-        status = 200;
-        responseObject = { result: `The telegram token and chat id were updated.` };
+        responseObject = {
+          result: `The telegram token and chat id were updated.`,
+          code: 200,
+          method: 'update'
+        };
       } else {
-        status = 400;
-        responseObject = { result: 'The token is not valid.' };
+        responseObject = {
+          result: 'The token is not valid.',
+          code: 400,
+          method: 'update'
+        };
       }
     } else {
-      status = 401;
-      responseObject = { result: `The request was unauthorized.` };
+      responseObject = {
+        result: `The request was unauthorized.`,
+        code: 401,
+        method: 'update'
+      };
     }
   } else {
-    status = 404;
-    responseObject = { result: 'The client was not found.' };
+    responseObject = {
+      result: 'The client was not found.',
+      code: 404,
+      method: 'update'
+    };
   }
   return new Response(JSON.stringify(responseObject), {
-    status,
+    status: 200,
     headers: {
       'Content-Type': 'application/json'
     }
