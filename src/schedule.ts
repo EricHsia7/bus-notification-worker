@@ -34,7 +34,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
     const validation = OTPAuthValidate(paramClientID, client.secret, paramTOTPToken);
     if (validation) {
       const scheduledTime = new Date(paramScheduledTime);
-      if (scheduledTime.getTime() > now.getTime() + 60 * 5 * 1000) {
+      if (scheduledTime.getTime() > now.getTime() + 60 * 3 * 1000) {
         const scheduleObject: Schedule = {
           client_id: paramClientID,
           message: paramMessage,
@@ -49,7 +49,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
         };
       } else {
         responseObject = {
-          result: 'The scheduled time shall be at least 5 minutes after.',
+          result: 'The scheduled time shall be at least 3 minutes after.',
           code: 400,
           method: 'schedule',
           schedule_id: 'null'
