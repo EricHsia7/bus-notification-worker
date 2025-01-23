@@ -8,8 +8,8 @@ export async function send(event, env, ctx) {
   // Retrieve scheduled tasks
   const schedules = await env.bus_notification_kv.list({ prefix: 'schedule_' });
 
-  for (const scheduleKey of schedules.keys) {
-    const scheduleJSON = await env.bus_notification_kv.get(scheduleKey.name);
+  for (const schedule of schedules.keys) {
+    const scheduleJSON = await env.bus_notification_kv.get(schedule.name);
     if (scheduleJSON) {
       const scheduleObject = JSON.parse(scheduleJSON) as Schedule;
       const scheduledTime = new Date(scheduleObject.scheduled_time);
@@ -18,7 +18,7 @@ export async function send(event, env, ctx) {
         if (clientJSON) {
           const clientObject = JSON.parse(clientJSON) as Client;
           await sendMessageViaTelegram(clientObject.token, clientObject.chat_id, scheduleObject.message);
-          await env.bus_notification_kv.delete(scheduleKey);
+          await env.bus_notification_kv.delete(schedule.name);
         }
       }
     }
