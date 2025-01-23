@@ -19,7 +19,7 @@ export async function register(request, env, ctx) {
   const TOTPSecret = OTPAuthSecret(24);
 
   let status = 500;
-  let responseText = 'bad request';
+  let responseText = JSON.stringify({ result: 'bad request' });
 
   const telegramBotTokenValidation = await checkTelegramBotToken(paramTelegramToken);
   if (telegramBotTokenValidation) {
@@ -32,12 +32,13 @@ export async function register(request, env, ctx) {
     };
     await env.bus_notification_kv.put(clientID, JSON.stringify(client));
     responseText = JSON.stringify({
+      result: 'successful',
       client_id: clientID,
       secret: TOTPSecret
     });
     status = 200;
   } else {
-    responseText = 'error';
+    responseText = JSON.stringify({ result: 'error' });
     status = 400;
   }
   return new Response(responseText, {
