@@ -1,3 +1,4 @@
+import { headers } from '.';
 import { checkTelegramBotToken } from './telegram';
 import { generateIdentifier, OTPAuthSecret } from './tools';
 
@@ -44,8 +45,6 @@ export async function register(request, env, ctx): Promise<Response> {
   }
   return new Response(JSON.stringify(responseObject), {
     status,
-    headers: {
-      'Content-Type': 'application/json'
-    }
+    headers: headers
   });
 }

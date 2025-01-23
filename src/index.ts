@@ -8,6 +8,13 @@ interface Env {
   bus_notification_kv: KVNamespace;
 }
 
+export const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': '*'
+};
+
 // Export a default object containing event handlers
 export default {
   // The fetch handler is invoked when this worker receives a HTTP(S) request and should return a Response (optionally wrapped in a Promise)
@@ -38,9 +45,7 @@ export default {
       default:
         return new Response(`The method '${param_method}' is unsupported.`, {
           status: 400,
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: headers
         });
         break;
     }

@@ -1,3 +1,4 @@
+import { headers } from '.';
 import { Client } from './register';
 import { generateIdentifier, OTPAuthValidate } from './tools';
 
@@ -21,7 +22,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
 
   let status = 500;
   let responseObject = { result: 'There was an unknown error.' };
-  
+
   const clientIDTest = /^(client_)([A-Za-z0-9_-]{32,32})$/gm.test(paramClientID);
   const clientJSON = await env.bus_notification_kv.get(paramClientID);
   if (clientIDTest && clientJSON) {
@@ -55,8 +56,6 @@ export async function schedule(request, env, ctx): Promise<Response> {
   }
   return new Response(JSON.stringify(responseObject), {
     status,
-    headers: {
-      'Content-Type': 'application/json'
-    }
+    headers: headers
   });
 }

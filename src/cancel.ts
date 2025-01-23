@@ -1,3 +1,4 @@
+import { headers } from '.';
 import { Client } from './register';
 import { Schedule } from './schedule';
 import { generateIdentifier, OTPAuthValidate } from './tools';
@@ -48,8 +49,6 @@ export async function cancel(request, env, ctx): Promise<Response> {
   }
   return new Response(JSON.stringify(responseObject), {
     status,
-    headers: {
-      'Content-Type': 'application/json'
-    }
+    headers: headers
   });
 }
