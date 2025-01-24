@@ -12,8 +12,8 @@ export function OTPAuthValidate(clientID: NClientBackend['client_id'], secret: s
     issuer: 'BusNotification',
     label: clientID,
     algorithm: 'SHA256',
-    digits: 6,
-    period: 30,
+    digits: 8,
+    period: 15,
     secret: secret
   });
   let delta = totp.validate({

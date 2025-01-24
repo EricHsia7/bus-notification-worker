@@ -18,7 +18,7 @@ export async function register(request, env, ctx): Promise<Response> {
   const paramTelegramChatID = urlParams.get('chat_id');
 
   const clientID = generateIdentifier('client');
-  const TOTPSecret = OTPAuthSecret(24);
+  const TOTPSecret = OTPAuthSecret(32);
 
   let responseObject: NResponseRegister = {
     result: 'There was an unknown error.',
