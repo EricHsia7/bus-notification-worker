@@ -8,18 +8,17 @@ interface Env {
   bus_notification_kv: KVNamespace;
 }
 
-export type methodType = 'cancel' | 'register' | 'schedule' | 'update';
-export type responseCode = 200 | 400 | 401 | 404 | 500;
+export type NResponseCode = 200 | 400 | 401 | 404 | 500;
 
 export interface NResponseCancel {
   result: string;
-  code: responseCode;
+  code: NResponseCode;
   method: 'cancel';
 }
 
 export interface NResponseRegister {
   result: string;
-  code: responseCode;
+  code: NResponseCode;
   method: 'register';
   client_id: string | 'null';
   secret: string | 'null';
@@ -27,14 +26,14 @@ export interface NResponseRegister {
 
 export interface NResponseSchedule {
   result: string;
-  code: responseCode;
+  code: NResponseCode;
   method: 'schedule';
   schedule_id: string | 'null';
 }
 
 export interface NResponseUpdate {
   result: string;
-  code: responseCode;
+  code: NResponseCode;
   method: 'update';
 }
 
