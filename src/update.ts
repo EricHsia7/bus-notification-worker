@@ -1,4 +1,4 @@
-import { ResponseObjectUpdate } from '.';
+import { headers, ResponseObjectUpdate } from '.';
 import { Client } from './register';
 import { checkTelegramBotToken } from './telegram';
 import { OTPAuthValidate } from './tools';
@@ -35,7 +35,7 @@ export async function update(request, env, ctx): Promise<Response> {
         };
         await env.bus_notification_kv.put(paramClientID, JSON.stringify(newClientObject));
         responseObject = {
-          result: `The telegram token and chat id were updated.`,
+          result: 'The telegram token and chat id were updated.',
           code: 200,
           method: 'update'
         };
@@ -62,8 +62,6 @@ export async function update(request, env, ctx): Promise<Response> {
   }
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: {
-      'Content-Type': 'application/json'
-    }
+    headers: headers
   });
 }
