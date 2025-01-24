@@ -1,4 +1,4 @@
-import { Client } from './register';
+import { NClientBackend } from './register';
 import { Schedule } from './schedule';
 import { sendMessageViaTelegram } from './telegram';
 
@@ -16,7 +16,7 @@ export async function send(event, env, ctx) {
       if (now.getTime() >= scheduledTime.getTime()) {
         const clientJSON = await env.bus_notification_kv.get(scheduleObject.client_id);
         if (clientJSON) {
-          const clientObject = JSON.parse(clientJSON) as Client;
+          const clientObject = JSON.parse(clientJSON) as NClientBackend;
           await sendMessageViaTelegram(clientObject.token, clientObject.chat_id, scheduleObject.message);
           await env.bus_notification_kv.delete(schedule.name);
         }

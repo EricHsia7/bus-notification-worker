@@ -11,13 +11,13 @@ interface Env {
 export type methodType = 'cancel' | 'register' | 'schedule' | 'update';
 export type responseCode = 200 | 400 | 401 | 404 | 500;
 
-export interface ResponseObjectCancel {
+export interface NResponseCancel {
   result: string;
   code: responseCode;
   method: 'cancel';
 }
 
-export interface ResponseObjectRegister {
+export interface NResponseRegister {
   result: string;
   code: responseCode;
   method: 'register';
@@ -25,20 +25,20 @@ export interface ResponseObjectRegister {
   secret: string | 'null';
 }
 
-export interface ResponseObjectSchedule {
+export interface NResponseSchedule {
   result: string;
   code: responseCode;
   method: 'schedule';
   schedule_id: string | 'null';
 }
 
-export interface ResponseObjectUpdate {
+export interface NResponseUpdate {
   result: string;
   code: responseCode;
   method: 'update';
 }
 
-export type ResponseObject = ResponseObjectCancel | ResponseObjectRegister | ResponseObjectSchedule | ResponseObjectUpdate;
+export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseUpdate;
 
 export const headers = {
   'Content-Type': 'application/json',

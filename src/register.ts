@@ -1,8 +1,8 @@
-import { headers, ResponseObjectRegister } from '.';
+import { headers, NResponseRegister } from '.';
 import { checkTelegramBotToken } from './telegram';
 import { generateIdentifier, OTPAuthSecret } from './tools';
 
-export interface Client {
+export interface NClientBackend {
   token: string;
   chat_id: number;
   secret: string;
@@ -20,7 +20,7 @@ export async function register(request, env, ctx): Promise<Response> {
   const clientID = generateIdentifier('client');
   const TOTPSecret = OTPAuthSecret(24);
 
-  let responseObject: ResponseObjectRegister = {
+  let responseObject: NResponseRegister = {
     result: 'There was an unknown error.',
     code: 500,
     method: 'register',
@@ -30,7 +30,7 @@ export async function register(request, env, ctx): Promise<Response> {
 
   const telegramBotTokenValidation = await checkTelegramBotToken(paramTelegramToken);
   if (telegramBotTokenValidation) {
-    const clientObject: Client = {
+    const clientObject: NClientBackend = {
       token: paramTelegramToken,
       chat_id: parseInt(paramTelegramChatID),
       secret: TOTPSecret,

@@ -1,5 +1,5 @@
 import * as OTPAuth from 'otpauth';
-import { Client } from './register';
+import { NClientBackend } from './register';
 
 export function OTPAuthSecret(size: number): string {
   const secret = new OTPAuth.Secret({ size });
@@ -7,7 +7,7 @@ export function OTPAuthSecret(size: number): string {
   return encodedSecret;
 }
 
-export function OTPAuthValidate(clientID: Client['client_id'], secret: string, token: string): boolean {
+export function OTPAuthValidate(clientID: NClientBackend['client_id'], secret: string, token: string): boolean {
   let totp = new OTPAuth.TOTP({
     issuer: 'BusNotification',
     label: clientID,
