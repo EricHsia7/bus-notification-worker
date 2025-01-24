@@ -56,7 +56,7 @@ export const headers = {
 
 export const TOTPSecretSize = 32;
 export const TOTPDigits = 8;
-export const TOTPPeriod = 15;
+export const TOTPPeriod = 10;
 
 // Export a default object containing event handlers
 export default {

@@ -1,4 +1,4 @@
-import { headers, NResponseRegister, NResponseRotate, TOTPSecretSize } from '.';
+import { headers, NResponseRotate, TOTPSecretSize } from '.';
 import { OTPAuthSecret, OTPAuthValidate } from './tools';
 
 export interface NClientBackend {
