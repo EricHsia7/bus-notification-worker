@@ -1,4 +1,4 @@
-import { headers, NResponseRegister } from '.';
+import { headers, NResponseRegister, TOTPSecretSize } from '.';
 import { checkTelegramBotToken } from './telegram';
 import { generateIdentifier, OTPAuthSecret } from './tools';
 
@@ -18,7 +18,7 @@ export async function register(request, env, ctx): Promise<Response> {
   const paramTelegramChatID = urlParams.get('chat_id');
 
   const clientID = generateIdentifier('client');
-  const TOTPSecret = OTPAuthSecret(32);
+  const TOTPSecret = OTPAuthSecret(TOTPSecretSize);
 
   let responseObject: NResponseRegister = {
     result: 'There was an unknown error.',

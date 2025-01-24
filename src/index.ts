@@ -1,5 +1,6 @@
 import { cancel } from './cancel';
 import { register } from './register';
+import { rotate } from './rotate';
 import { schedule } from './schedule';
 import { send } from './send';
 import { update } from './update';
@@ -37,7 +38,14 @@ export interface NResponseUpdate {
   method: 'update';
 }
 
-export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseUpdate;
+export interface NResponseRotate {
+  result: string;
+  code: NResponseCode;
+  method: 'rotate';
+  secret: string | 'null'
+}
+
+export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseUpdate | NResponseRotate;
 
 export const headers = {
   'Content-Type': 'application/json',
@@ -45,6 +53,10 @@ export const headers = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': '*'
 };
+
+export const TOTPSecretSize = 32;
+export const TOTPDigits = 8;
+export const TOTPPeriod = 15;
 
 // Export a default object containing event handlers
 export default {
@@ -70,6 +82,10 @@ export default {
       case 'update':
         const updating = await update(request, env, ctx);
         return updating;
+        break;
+      case 'rotate':
+        const rotation = await rotate(request, env, ctx);
+        return rotation;
         break;
       default:
         return new Response(

@@ -1,5 +1,6 @@
 import * as OTPAuth from 'otpauth';
 import { NClientBackend } from './register';
+import { TOTPDigits, TOTPPeriod } from '.';
 
 export function OTPAuthSecret(size: number): string {
   const secret = new OTPAuth.Secret({ size });
@@ -12,8 +13,8 @@ export function OTPAuthValidate(clientID: NClientBackend['client_id'], secret: s
     issuer: 'BusNotification',
     label: clientID,
     algorithm: 'SHA256',
-    digits: 8,
-    period: 15,
+    digits: TOTPDigits,
+    period: TOTPPeriod,
     secret: secret
   });
   let delta = totp.validate({
