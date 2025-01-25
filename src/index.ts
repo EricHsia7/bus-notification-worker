@@ -92,7 +92,8 @@ export default {
           JSON.stringify({
             result: `The method '${param_method}' is unsupported.`,
             code: 400,
-            method: param_method
+            method: param_method,
+            test: env.TEST
           }),
           {
             status: 200,
