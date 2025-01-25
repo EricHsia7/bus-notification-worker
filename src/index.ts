@@ -1,4 +1,4 @@
-import { KVNamespace, D1Database } from '@cloudflare/workers-types';
+import { D1Database } from '@cloudflare/workers-types';
 import { cancel } from './cancel';
 import { register } from './register';
 import { rotate } from './rotate';
@@ -6,7 +6,6 @@ import { schedule } from './schedule';
 import { send } from './send';
 
 export interface Env {
-  bus_notification_kv: KVNamespace;
   DB: D1Database;
 }
 

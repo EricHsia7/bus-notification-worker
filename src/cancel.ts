@@ -1,6 +1,6 @@
 import { headers, NResponseCancel } from './index';
-import { generateIdentifier, OTPAuthValidate } from './tools';
-import { addSchedule, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, ScheduleIDRegularExpression } from './database';
+import { OTPAuthValidate } from './tools';
+import { ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, ScheduleIDRegularExpression } from './database';
 
 export async function cancel(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);

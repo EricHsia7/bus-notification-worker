@@ -10,12 +10,6 @@
       "database_id": "6a3988cf-2c14-4dca-9930-ecb3ec3f5105"
     }
   ],
-  "kv_namespaces": [
-    {
-      "binding": "bus_notification_kv",
-      "id": "c15c7c2744104f51bf9e35b12aa55148"
-    }
-  ],
   "triggers": {
     "crons": ["* * * * *"]
   }

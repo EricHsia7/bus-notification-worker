@@ -10,7 +10,7 @@ export async function checkTelegramBotToken(token: string): Promise<boolean> {
   }
 }
 
-export async function sendMessageViaTelegram(token: string, chat_id: NClientBackend['chat_id'], message: string): Promise<object> {
+export async function sendMessageViaTelegram(token: string, chat_id: string, message: string): Promise<object> {
   const telegramAPI = `https://api.telegram.org/bot${token}/sendMessage`;
   try {
     const response = await fetch(telegramAPI, {
