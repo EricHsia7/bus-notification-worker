@@ -73,6 +73,11 @@ export async function getClient(client_id: NClientBackend['ClientID'], env: Env)
   }
 }
 
+export async function setClientSecret(client_id: NClientBackend['ClientID'], previousSecret: NClientBackend['Secret'], newSecret: NClientBackend['Secret'], env: Env) {
+  const updateSecret = `UPDATE "Client" SET "Secret" = ? WHERE ClientID = ? AND Secret = ?;`;
+  await env.DB.prepare(updateSecret).bind(newSecret, client_id, previousSecret).run();
+}
+
 export async function recordTOTPToken(token: NTOTPTokenBackend['Token'], env: Env) {
   const insertTOTPToken = `INSERT INTO "TOTPToken" ("ClientID", "Token", "TimeStamp") VALUES (?, ?, ?);`;
   const timeStamp = new Date().getTime();
