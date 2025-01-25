@@ -1,6 +1,7 @@
 import { TOTPPeriod, Env } from './index';
 
-const createClientTable = `CREATE TABLE IF NOT EXISTS "Client" (
+const ClientTableName = 'Client'
+const createClientTable = `CREATE TABLE IF NOT EXISTS "${ClientTableName}" (
   "Number" INTEGER PRIMARY KEY,
   "ClientID" VARCHAR(50) NULL,
   "Secret" VARCHAR(50) NULL,
@@ -17,7 +18,8 @@ export interface NClientBackend {
   TimeStamp: number;
 }
 
-const createScheduleTable = `CREATE TABLE IF NOT EXISTS "Schedule" (
+const ScheduleTableName = 'Schedule'
+const createScheduleTable = `CREATE TABLE IF NOT EXISTS "${ScheduleTableName}" (
   "Number" INTEGER PRIMARY KEY,
   "ScheduleID" VARCHAR(50) NULL,
   "ClientID" VARCHAR(50) NULL,
@@ -37,7 +39,8 @@ export interface NScheduleBackend {
   TimeStamp: number;
 }
 
-const createTOTPToken = `CREATE TABLE IF NOT EXISTS "TOTPToken" (
+const TOTPTokenTableName = 'TOTPToken'
+const createTOTPToken = `CREATE TABLE IF NOT EXISTS "${TOTPTokenTableName}" (
   "Number" INTEGER PRIMARY KEY,
   "ClientID" VARCHAR(50) NULL,
   "Token" CHAR(8) NULL,
@@ -58,13 +61,13 @@ export async function initializeDB(env: Env) {
 }
 
 export async function addClient(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], env: Env) {
-  const insertClient = `INSERT INTO "Client" ("ClientID", "Secret", "TimeStamp") VALUES (?, ?, ?);`;
+  const insertClient = `INSERT INTO "${ClientTableName}" ("ClientID", "Secret", "TimeStamp") VALUES (?, ?, ?);`;
   const timeStamp = new Date().getTime();
   await env.DB.prepare(insertClient).bind(client_id, secret, timeStamp).run();
 }
 
 export async function getClient(client_id: NClientBackend['ClientID'], env: Env): Promise<NClientBackend | false> {
-  const selectClient = `SELECT * FROM "Client" WHERE ClientID = ?;`;
+  const selectClient = `SELECT * FROM "${ClientTableName}" WHERE ClientID = ?;`;
   const { results } = (await env.DB.prepare(selectClient).bind(client_id).all()) as Array<NClientBackend>;
   if (results.length > 0) {
     return results[0];
@@ -75,7 +78,7 @@ export async function getClient(client_id: NClientBackend['ClientID'], env: Env)
 
 export async function setClientSecret(client_id: NClientBackend['ClientID'], newSecret: NClientBackend['Secret'], env: Env) {
   const updateSecret = `
-  UPDATE "Client" 
+  UPDATE "${ClientTableName}" 
   SET "Secret" = ?, "TimeStamp" = ?
   WHERE "ClientID" = ?;
 `;
@@ -84,19 +87,19 @@ export async function setClientSecret(client_id: NClientBackend['ClientID'], new
 }
 
 export async function recordTOTPToken(token: NTOTPTokenBackend['Token'], env: Env) {
-  const insertTOTPToken = `INSERT INTO "TOTPToken" ("ClientID", "Token", "TimeStamp") VALUES (?, ?, ?);`;
+  const insertTOTPToken = `INSERT INTO "${TOTPTokenTableName}" ("ClientID", "Token", "TimeStamp") VALUES (?, ?, ?);`;
   const timeStamp = new Date().getTime();
   await env.DB.prepare(insertTOTPToken).bind(client_id, token, timeStamp).run();
 }
 
 export async function discardExpiredTOTPToken(env: Env) {
-  const deleteTOTPToken = `DELETE FROM "TOTPToken" WHERE TimeStamp < ?`;
+  const deleteTOTPToken = `DELETE FROM "${TOTPTokenTableName}" WHERE TimeStamp < ?`;
   const deadline = new Date().getTime() - TOTPPeriod * 3 * 1000;
   await env.DB.prepare(deleteTOTPToken).bind(deadline).run();
 }
 
 export async function checkTOTPToken(client_id: NClientBackend['ClientID'], token: NTOTPTokenBackend['Token'], env: Env): Promise<boolean> {
-  const selectTOTPToken = `SELECT * FROM "TOTPToken" WHERE ClientID = ? AND Token = ?`;
+  const selectTOTPToken = `SELECT * FROM "${TOTPTokenTableName}" WHERE ClientID = ? AND Token = ?`;
   const { results } = await env.DB.prepare(selectTOTPToken).bind(client_id, token).run();
   if (results.length > 0) {
     return true;
@@ -106,13 +109,13 @@ export async function checkTOTPToken(client_id: NClientBackend['ClientID'], toke
 }
 
 export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], message: NScheduleBackend['Message'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
-  const insertSchedule = `INSERT INTO "Schedule" ("ScheduleID", "ClientID", "Message", "ScheduledTime", "TimeStamp") VALUES (?, ?, ?, ?, ?);`;
+  const insertSchedule = `INSERT INTO "${ScheduleTableName}" ("ScheduleID", "ClientID", "Message", "ScheduledTime", "TimeStamp") VALUES (?, ?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
   await env.DB.prepare(insertSchedule).bind(schedule_id, client_id, message, scheduled_time, timeStamp).run();
 }
 
 export async function getSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], env: Env): Promise<NScheduleBackend | false> {
-  const selectSchedule = `SELECT * FROM "Schedule" WHERE ScheduleID = ? AND ClientID = ?`;
+  const selectSchedule = `SELECT * FROM "${ScheduleTableName}" WHERE ScheduleID = ? AND ClientID = ?`;
   const { results } = (await env.DB.prepare(selectSchedule).bind(schedule_id, client_id).all()) as Array<NScheduleBackend>;
   if (results.length > 0) {
     return results[0];
@@ -122,18 +125,18 @@ export async function getSchedule(schedule_id: NScheduleBackend['ScheduleID'], c
 }
 
 export async function discardSchedule(schedule_id: NScheduleBackend['ScheduleID'], env: Env) {
-  const deleteSchedule = `DELETE FROM "Schedule" WHERE ScheduleID = ?`;
+  const deleteSchedule = `DELETE FROM "${ScheduleTableName}" WHERE ScheduleID = ?`;
   await env.DB.prepare(deleteSchedule).bind(schedule_id).run();
 }
 
 export async function listSchedules(deadline: number, env: Env): Promise<Array<NScheduleBackend>> {
-  const selectSchedule = `SELECT * FROM "Schedule" WHERE ScheduledTime <= ?`;
+  const selectSchedule = `SELECT * FROM "${ScheduleTableName}" WHERE ScheduledTime <= ?`;
   const { results } = (await env.DB.prepare(selectSchedule).bind(deadline).all()) as Array<NScheduleBackend>;
   return results;
 }
 
 export async function discardExpiredSchedules(deadline: number, env: Env) {
-  const deleteSchedule = `DELETE FROM "Schedule" WHERE ScheduledTime <= ?`;
+  const deleteSchedule = `DELETE FROM "${ScheduleTableName}" WHERE ScheduledTime <= ?`;
   const { results } = (await env.DB.prepare(deleteSchedule).bind(deadline).all()) as Array<NScheduleBackend>;
   return results;
 }
