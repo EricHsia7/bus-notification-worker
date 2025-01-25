@@ -25,9 +25,9 @@ const createScheduleTable = `CREATE TABLE IF NOT EXISTS "${ScheduleTableName}" (
   "ClientID" VARCHAR(50) NULL,
   "StopID" INTEGER NULL,
   "LocationName" VARCHAR(512) NULL,
-  "RouteID" INTEGER NULL
+  "RouteID" INTEGER NULL,
   "RouteName" VARCHAR(512) NULL,
-  "Direction" VARCHAR(512) NULL
+  "Direction" VARCHAR(512) NULL,
   "EstimateTime" INTEGER NULL,
   "Photo" INTEGER NULL,
   "ScheduledTime" INTEGER NULL,
@@ -121,7 +121,22 @@ export async function checkTOTPToken(client_id: NClientBackend['ClientID'], toke
 }
 
 export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], stop_id: NScheduleBackend['StopID'], location_name: NScheduleBackend['LocationName'], route_id: NScheduleBackend['RouteID'], route_name: NScheduleBackend['RouteName'], direction: NScheduleBackend['Direction'], estimate_time: NScheduleBackend['EstimateTime'], photo: NScheduleBackend['Photo'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
-  const insertSchedule = `INSERT INTO "${ScheduleTableName}" ("ScheduleID", "ClientID", "StopID", "LocationName", "RouteID", "RouteName", "Direction", "EstimateTime", "Photo", "ScheduledTime", "TimeStamp") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+  const insertSchedule = `INSERT INTO
+  "${ScheduleTableName}" (
+    "ScheduleID",
+    "ClientID",
+    "StopID",
+    "LocationName",
+    "RouteID",
+    "RouteName",
+    "Direction",
+    "EstimateTime",
+    "Photo",
+    "ScheduledTime",
+    "TimeStamp"
+  )
+VALUES
+  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
   await env.DB.prepare(insertSchedule)
     .bind(schedule_id, client_id, stop_id, location_name, route_id, route_name, direction, estimate_time, photo === true ? 1 : 0, scheduled_time, timeStamp)
