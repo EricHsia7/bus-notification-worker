@@ -1,7 +1,6 @@
-import { headers } from '.';
+import { headers, NResponseRotate, TOTPSecretSize } from './index';
 import { OTPAuthSecret, OTPAuthValidate } from './tools';
 import { ClientIDRegularExpression, getClient, NClientBackend, NTOTPTokenBackend, setClientSecret } from './database';
-import { NResponseRotate, TOTPSecretSize } from './index';
 
 export async function rotate(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
@@ -42,7 +41,7 @@ export async function rotate(request, env, ctx): Promise<Response> {
       } else {
         responseObject = {
           result: 'The request was unauthorized.',
-          code: 401,
+          code: 403,
           method: 'rotate',
           secret: 'null'
         };

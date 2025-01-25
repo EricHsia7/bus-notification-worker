@@ -1,5 +1,4 @@
-import { Env } from '.';
-import { TOTPPeriod } from './index';
+import { TOTPPeriod, Env } from './index';
 
 const createClientTable = `CREATE TABLE IF NOT EXISTS "Client" (
   "Number" INTEGER PRIMARY KEY,
@@ -105,6 +104,21 @@ export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], c
   const insertSchedule = `INSERT INTO "Schedule" ("ScheduleID", "ClientID", "Message", "ScheduledTime", "TimeStamp") VALUES (?, ?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
   await env.DB.prepare(insertSchedule).bind(schedule_id, client_id, message, scheduled_time, timeStamp).run();
+}
+
+export async function getSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], env: Env): Promise<NScheduleBackend | false> {
+  const selectSchedule = `SELECT * FROM "Schedule" WHERE ScheduleID = ? AND ClientID = ?`;
+  const { results } = (await env.DB.prepare(selectSchedule).bind(schedule_id, client_id).all()) as Array<NScheduleBackend>;
+  if (results.length > 0) {
+    return results[0];
+  } else {
+    return false;
+  }
+}
+
+export async function discardSchedule(schedule_id: NScheduleBackend['ScheduleID'], env: Env) {
+  const deleteSchedule = `DELETE FROM "Schedule" WHERE ScheduleID = ?`;
+  await env.DB.prepare(deleteSchedule).bind(schedule_id).run();
 }
 
 export async function listSchedules(deadline: number, env: Env): Promise<Array<NScheduleBackend>> {

@@ -1,5 +1,4 @@
-import { headers, NResponseRegister, TOTPSecretSize } from '.';
-import { Env } from './index';
+import { headers, NResponseRegister, TOTPSecretSize, Env } from './index';
 import { addClient, initializeDB } from './database';
 import { generateIdentifier, OTPAuthSecret, sha256 } from './tools';
 
@@ -28,20 +27,30 @@ export async function register(request, env: Env, ctx): Promise<Response> {
     secret: 'null'
   };
 
-  if (paramHash === envHash_previous || paramHash === envHash_current || paramHash === envHash_next) {
-    await initializeDB(env);
-    await addClient(clientID, TOTPSecret, env);
-    responseObject = {
-      result: 'Client was registered.',
-      code: 200,
-      method: 'register',
-      client_id: clientID,
-      secret: TOTPSecret
-    };
+  if (String(env.ALLOW_REGISTRATION).toLowerCase() === 'true') {
+    if (paramHash === envHash_previous || paramHash === envHash_current || paramHash === envHash_next) {
+      await initializeDB(env);
+      await addClient(clientID, TOTPSecret, env);
+      responseObject = {
+        result: 'Client was registered.',
+        code: 200,
+        method: 'register',
+        client_id: clientID,
+        secret: TOTPSecret
+      };
+    } else {
+      responseObject = {
+        result: 'The hash is not valid.',
+        code: 400,
+        method: 'register',
+        client_id: 'null',
+        secret: 'null'
+      };
+    }
   } else {
     responseObject = {
-      result: 'The hash is not valid.',
-      code: 400,
+      result: 'The registration is not allowed at this moment.',
+      code: 403,
       method: 'register',
       client_id: 'null',
       secret: 'null'

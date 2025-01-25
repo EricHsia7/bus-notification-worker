@@ -1,4 +1,4 @@
-import { headers, NResponseSchedule } from '.';
+import { headers, NResponseSchedule } from './index';
 import { generateIdentifier, OTPAuthValidate } from './tools';
 import { addSchedule, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend } from './database';
 
@@ -53,7 +53,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
       } else {
         responseObject = {
           result: 'The request was unauthorized.',
-          code: 401,
+          code: 403,
           method: 'schedule',
           schedule_id: 'null'
         };

@@ -1,6 +1,6 @@
 import * as OTPAuth from 'otpauth';
 import { NClientBackend } from './database';
-import { TOTPDigits, TOTPPeriod } from '.';
+import { TOTPDigits, TOTPPeriod } from './index';
 
 export const sha256 = require('sha256');
 
