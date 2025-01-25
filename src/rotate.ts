@@ -1,6 +1,6 @@
 import { headers } from '.';
 import { OTPAuthValidate } from './tools';
-import { ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend, setClientSecret } from './database';
+import { ClientIDRegularExpression, getClient, NClientBackend, NTOTPTokenBackend, setClientSecret } from './database';
 import { NResponseRotate, TOTPSecretSize } from './index';
 
 export async function rotate(request, env, ctx): Promise<Response> {
@@ -32,7 +32,7 @@ export async function rotate(request, env, ctx): Promise<Response> {
     } else {
       const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
       if (validation) {
-        await setClientSecret(thisClient.ClientID, thisClient.Secret, TOTPSecret, env);
+        await setClientSecret(thisClient.ClientID, TOTPSecret, env);
         responseObject = {
           result: 'The secret was rotated.',
           code: 200,
