@@ -80,7 +80,7 @@ export async function recordTOTPToken(token: NTOTPTokenBackend['Token'], env: En
 }
 
 export async function discardExpiredTOTPToken(env: Env) {
-  const deleteTOTPToken = `DELETE * FROM "TOTPToken" WHERE TimeStamp < ?`;
+  const deleteTOTPToken = `DELETE FROM "TOTPToken" WHERE TimeStamp < ?`;
   const deadline = new Date().getTime() - TOTPPeriod * 3 * 1000;
   await env.DB.prepare(deleteTOTPToken).bind(deadline).run();
 }
@@ -108,7 +108,7 @@ export async function listSchedules(deadline: number, env: Env): Promise<Array<N
 }
 
 export async function discardExpiredSchedules(deadline: number, env: Env) {
-  const deleteSchedule = `DELETE * FROM "Schedule" WHERE ScheduledTime <= ?`;
+  const deleteSchedule = `DELETE FROM "Schedule" WHERE ScheduledTime <= ?`;
   const { results } = (await env.DB.prepare(deleteSchedule).bind(deadline).all()) as Array<NScheduleBackend>;
   return results;
 }
