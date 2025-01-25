@@ -1,12 +1,15 @@
+import { KVNamespace, D1Database } from '@cloudflare/workers-types';
 import { cancel } from './cancel';
 import { register } from './register';
 import { rotate } from './rotate';
 import { schedule } from './schedule';
 import { send } from './send';
 import { update } from './update';
+import { getClient } from './sql';
 
-interface Env {
+export interface Env {
   bus_notification_kv: KVNamespace;
+  bus_notification_db: D1Database;
 }
 
 export type NResponseCode = 200 | 400 | 401 | 404 | 500;
@@ -42,7 +45,7 @@ export interface NResponseRotate {
   result: string;
   code: NResponseCode;
   method: 'rotate';
-  secret: string | 'null'
+  secret: string | 'null';
 }
 
 export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseUpdate | NResponseRotate;
@@ -61,7 +64,7 @@ export const TOTPPeriod = 10;
 // Export a default object containing event handlers
 export default {
   // The fetch handler is invoked when this worker receives a HTTP(S) request and should return a Response (optionally wrapped in a Promise)
-  async fetch(request, env, ctx) {
+  async fetch(request, env: Env, ctx) {
     const url = new URL(request.url);
     const url_params = url.searchParams;
     const param_method = url_params.get('method');
@@ -87,13 +90,16 @@ export default {
         const rotation = await rotate(request, env, ctx);
         return rotation;
         break;
+      case 'test':
+        
+        const test = await getClient('test', env);
+        return JSON.stringify(test);
       default:
         return new Response(
           JSON.stringify({
             result: `The method '${param_method}' is unsupported.`,
             code: 400,
-            method: param_method,
-            test: env.TEST
+            method: param_method
           }),
           {
             status: 200,

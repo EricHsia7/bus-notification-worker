@@ -1,12 +1,9 @@
 import { headers, NResponseRegister, TOTPSecretSize } from '.';
-import { checkTelegramBotToken } from './telegram';
 import { generateIdentifier, OTPAuthSecret } from './tools';
 
 export interface NClientBackend {
-  token: string;
-  chat_id: number;
-  secret: string;
   client_id: string;
+  secret: string;
   type: 'client';
 }
 
@@ -14,11 +11,18 @@ export async function register(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
   const urlParams = url.searchParams;
 
-  const paramTelegramToken = urlParams.get('token');
-  const paramTelegramChatID = urlParams.get('chat_id');
+  const paramHash = urlParams.get('hash');
 
   const clientID = generateIdentifier('client');
   const TOTPSecret = OTPAuthSecret(TOTPSecretSize);
+
+  const currentDate = new Date();
+  currentDate.setMilliseconds(0);
+  currentDate.setSeconds(0);
+
+  const envHash_previous = sha256(`${env.REGISTRATION_KEY}${currentDate.getTime() - 60 * 1000}`);
+  const envHash_current = sha256(`${env.REGISTRATION_KEY}${currentDate.getTime()}`);
+  const envHash_next = sha256(`${env.REGISTRATION_KEY}${currentDate.getTime() + 60 * 1000}`);
 
   let responseObject: NResponseRegister = {
     result: 'There was an unknown error.',
@@ -28,16 +32,13 @@ export async function register(request, env, ctx): Promise<Response> {
     secret: 'null'
   };
 
-  const telegramBotTokenValidation = await checkTelegramBotToken(paramTelegramToken);
-  if (telegramBotTokenValidation) {
+  if (paramHash === envHash_previous || paramHash === envHash_current || paramHash === envHash_next) {
     const clientObject: NClientBackend = {
-      token: paramTelegramToken,
-      chat_id: parseInt(paramTelegramChatID),
       secret: TOTPSecret,
       client_id: clientID,
       type: 'client'
     };
-    await env.bus_notification_kv.put(clientID, JSON.stringify(clientObject));
+    
     responseObject = {
       result: 'Client was registered.',
       code: 200,

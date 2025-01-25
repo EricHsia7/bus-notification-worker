@@ -1,14 +1,6 @@
 import { headers, NResponseRotate, TOTPSecretSize } from '.';
 import { OTPAuthSecret, OTPAuthValidate } from './tools';
 
-export interface NClientBackend {
-  token: string;
-  chat_id: number;
-  secret: string;
-  client_id: string;
-  type: 'client';
-}
-
 export async function rotate(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
   const urlParams = url.searchParams;

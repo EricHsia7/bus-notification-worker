@@ -14,9 +14,11 @@
   },
   "homepage": "https://erichsia7.github.io/bus-notification-worker/",
   "devDependencies": {
-    "wrangler": "^3.103.2"
+    "wrangler": "^3.103.2",
+    "@cloudflare/workers-types": "^4.20250124.3"
   },
   "dependencies": {
-    "otpauth": "^9.3.6"
+    "otpauth": "^9.3.6",
+    "sha256": "^0.2.0"
   }
 }
