@@ -1,5 +1,7 @@
 import { headers, NResponseRegister, TOTPSecretSize } from '.';
-import { generateIdentifier, OTPAuthSecret } from './tools';
+import { Env } from './index';
+import { addClient, initializeDB } from './sql';
+import { generateIdentifier, OTPAuthSecret, sha256 } from './tools';
 
 export interface NClientBackend {
   client_id: string;
@@ -7,7 +9,7 @@ export interface NClientBackend {
   type: 'client';
 }
 
-export async function register(request, env, ctx): Promise<Response> {
+export async function register(request, env: Env, ctx): Promise<Response> {
   const url = new URL(request.url);
   const urlParams = url.searchParams;
 
@@ -33,12 +35,8 @@ export async function register(request, env, ctx): Promise<Response> {
   };
 
   if (paramHash === envHash_previous || paramHash === envHash_current || paramHash === envHash_next) {
-    const clientObject: NClientBackend = {
-      secret: TOTPSecret,
-      client_id: clientID,
-      type: 'client'
-    };
-    
+    await initializeDB(env);
+    await addClient(clientID, TOTPSecret, env);
     responseObject = {
       result: 'Client was registered.',
       code: 200,
@@ -48,7 +46,7 @@ export async function register(request, env, ctx): Promise<Response> {
     };
   } else {
     responseObject = {
-      result: 'The token is not valid.',
+      result: 'The hash is not valid.',
       code: 400,
       method: 'register',
       client_id: 'null',

@@ -4,7 +4,6 @@ import { register } from './register';
 import { rotate } from './rotate';
 import { schedule } from './schedule';
 import { send } from './send';
-import { update } from './update';
 import { getClient } from './sql';
 
 export interface Env {
@@ -35,12 +34,6 @@ export interface NResponseSchedule {
   schedule_id: string | 'null';
 }
 
-export interface NResponseUpdate {
-  result: string;
-  code: NResponseCode;
-  method: 'update';
-}
-
 export interface NResponseRotate {
   result: string;
   code: NResponseCode;
@@ -48,7 +41,7 @@ export interface NResponseRotate {
   secret: string | 'null';
 }
 
-export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseUpdate | NResponseRotate;
+export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate;
 
 export const headers = {
   'Content-Type': 'application/json',
@@ -81,10 +74,6 @@ export default {
       case 'cancel':
         const cancellation = await cancel(request, env, ctx);
         return cancellation;
-        break;
-      case 'update':
-        const updating = await update(request, env, ctx);
-        return updating;
         break;
       case 'rotate':
         const rotation = await rotate(request, env, ctx);

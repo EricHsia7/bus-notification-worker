@@ -2,6 +2,8 @@ import * as OTPAuth from 'otpauth';
 import { NClientBackend } from './register';
 import { TOTPDigits, TOTPPeriod } from '.';
 
+export const sha256 = require('sha256');
+
 export function OTPAuthSecret(size: number): string {
   const secret = new OTPAuth.Secret({ size });
   const encodedSecret = secret.base32;
