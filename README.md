@@ -95,7 +95,7 @@ To set up this worker on your own Cloudflare account and Telegram bot, you need 
 ### Issue Registration key
 
 1. To prevent unknown users from registering as clients, you should set a complex, random password and keep it secure and private.
-2. Although the registration key can be any string, however, **it’s strongly recommended to set a safe password** even you can turn off Allow registration later.
+2. Although the registration key can be any string, however, **it’s strongly recommended to set a safe password** even you can turn off allow registration later.
 
 ### Set Environment Secrets
 
@@ -125,6 +125,10 @@ To set up this worker on your own Cloudflare account and Telegram bot, you need 
 ### Register
 
 1. Open **Bus**
+
+> [!NOTE]
+> [@EricHsia7/bus](https://github.com/EricHsia7/bus) is an open source project available on GitHub.
+
 2. Click the **Settings** button at the top-left corner.
 3. Go to **Notification** section.
 4. Paste your API (Provider) and Registration key.
