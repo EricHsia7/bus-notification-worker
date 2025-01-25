@@ -1,6 +1,6 @@
 import { headers, NResponseSchedule } from '.';
 import { generateIdentifier, OTPAuthValidate } from './tools';
-import { NClientBackend, NScheduleBackend, NTOTPTokenBackend } from './database';
+import { addSchedule, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend } from './database';
 
 export async function schedule(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
@@ -22,49 +22,45 @@ export async function schedule(request, env, ctx): Promise<Response> {
   };
 
   const clientIDTest = /^(client_)([A-Za-z0-9_-]{32,32})$/gm.test(paramClientID);
-  const clientJSON = await env.bus_notification_kv.get(paramClientID);
-  if (clientIDTest && clientJSON) {
-    const client = JSON.parse(clientJSON) as NClientBackend;
-    const validation = OTPAuthValidate(paramClientID, client.secret, paramTOTPToken);
-    if (validation) {
-      const scheduledTime = new Date(paramScheduledTime);
-      if (scheduledTime.getTime() > now.getTime() + 60 * 3 * 1000) {
-        const scheduleObject: NScheduleBackend = {
-          client_id: paramClientID,
-          message: paramMessage,
-          scheduled_time: paramScheduledTime
-        };
-        await env.bus_notification_kv.put(scheduleID, JSON.stringify(scheduleObject));
-        responseObject = {
-          result: 'The notification was scheduled.',
-          code: 200,
-          method: 'schedule',
-          schedule_id: scheduleID
-        };
+  if (clientIDTest) {
+    const thisClient = await getClient(paramClientID, env);
+    if (typeof thisClient === 'boolean' && thisClient === false) {
+      responseObject = {
+        result: 'The client was not found.',
+        code: 404,
+        method: 'schedule',
+        schedule_id: 'null'
+      };
+    } else {
+      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.secret, paramTOTPToken);
+      if (validation) {
+        if (paramScheduledTime > now.getTime() + 60 * 3 * 1000) {
+          await addSchedule(scheduleID, paramClientID, paramMessage, paramScheduledTime, env);
+          responseObject = {
+            result: 'The notification was scheduled.',
+            code: 200,
+            method: 'schedule',
+            schedule_id: scheduleID
+          };
+        } else {
+          responseObject = {
+            result: 'The scheduled time shall be at least 3 minutes after.',
+            code: 400,
+            method: 'schedule',
+            schedule_id: 'null'
+          };
+        }
       } else {
         responseObject = {
-          result: 'The scheduled time shall be at least 3 minutes after.',
-          code: 400,
+          result: 'The request was unauthorized.',
+          code: 401,
           method: 'schedule',
           schedule_id: 'null'
         };
       }
-    } else {
-      responseObject = {
-        result: 'The request was unauthorized.',
-        code: 401,
-        method: 'schedule',
-        schedule_id: 'null'
-      };
     }
-  } else {
-    responseObject = {
-      result: 'The client was not found.',
-      code: 404,
-      method: 'schedule',
-      schedule_id: 'null'
-    };
   }
+
   return new Response(JSON.stringify(responseObject), {
     status: 200,
     headers: headers

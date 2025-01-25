@@ -59,11 +59,14 @@ export async function addClient(client_id: NClientBackend['ClientID'], secret: N
   await env.DB.prepare(insertClient).bind(client_id, secret, timeStamp).run();
 }
 
-export async function getClient(client_id: NClientBackend['ClientID'], env: Env): Promise<NClientBackend> {
+export async function getClient(client_id: NClientBackend['ClientID'], env: Env): Promise<NClientBackend | false> {
   const selectClient = `SELECT * FROM "Client" WHERE ClientID = ?;`;
   const { results } = (await env.DB.prepare(selectClient).bind(client_id).all()) as Array<NClientBackend>;
   if (results.length > 0) {
     return results[0];
+  }
+  else {
+    return false
   }
 }
 
