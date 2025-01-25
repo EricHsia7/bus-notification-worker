@@ -91,9 +91,8 @@ export default {
         return rotation;
         break;
       case 'test':
-
         const test = await getClient('test', env);
-        return JSON.stringify(test);
+        return new Response(JSON.stringify(test), { status: 200, headers: headers });
       default:
         return new Response(
           JSON.stringify({
