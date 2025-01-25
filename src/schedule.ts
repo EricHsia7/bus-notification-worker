@@ -8,7 +8,14 @@ export async function schedule(request, env, ctx): Promise<Response> {
 
   const paramClientID = urlParams.get('client_id') as NClientBackend['ClientID'];
   const paramTOTPToken = urlParams.get('totp_token') as NTOTPTokenBackend['Token'];
-  const paramMessage = urlParams.get('message') as NScheduleBackend['Message'];
+  const paramStopID = parseInt(urlParams.get('stop_id')) as NScheduleBackend['StopID'];
+  const paramLocationName = urlParams.get('location_name') as NScheduleBackend['LocationName'];
+  const paramRouteID = parseInt(urlParams.get('route_id')) as NScheduleBackend['RouteID'];
+  const paramRouteName = urlParams.get('route_name') as NScheduleBackend['RouteName'];
+  const paramDirection = urlParams.get('direction') as NScheduleBackend['Direction'];
+  const paramEstimateTime = parseInt(urlParams.get('estimate_time')) as NScheduleBackend['EstimateTime'];
+  const paramPhoto = (urlParams.get('photo') === 'true' ? true : false) as NScheduleBackend['Photo'];
+  const paramTimeFormattingMode = parseInt(urlParams.get('time_formatting_mode')) as NScheduleBackend['TimeFormattingMode'];
   const paramScheduledTime = new Date(urlParams.get('scheduled_time')).getTime() as NScheduleBackend['ScheduledTime'];
 
   const now = new Date();
@@ -34,8 +41,8 @@ export async function schedule(request, env, ctx): Promise<Response> {
     } else {
       const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
       if (validation) {
-        if (paramScheduledTime > now.getTime() + 60 * 3 * 1000) {
-          await addSchedule(scheduleID, paramClientID, paramMessage, paramScheduledTime, env);
+        if (paramScheduledTime > now.getTime() + 60 * 1 * 1000) {
+          await addSchedule(scheduleID, paramClientID, paramStopID, paramLocationName, paramRouteID, paramRouteName, paramDirection, paramEstimateTime, paramPhoto, paramTimeFormattingMode, paramScheduledTime, env);
           responseObject = {
             result: 'The notification was scheduled.',
             code: 200,
@@ -44,7 +51,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
           };
         } else {
           responseObject = {
-            result: 'The scheduled time shall be at least 3 minutes after.',
+            result: 'The scheduled time shall be at least 1 minute after.',
             code: 400,
             method: 'schedule',
             schedule_id: 'null'
