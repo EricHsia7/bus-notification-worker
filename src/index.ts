@@ -4,7 +4,6 @@ import { register } from './register';
 import { rotate } from './rotate';
 import { schedule } from './schedule';
 import { send } from './send';
-import { getClient } from './database';
 
 export interface Env {
   bus_notification_kv: KVNamespace;
@@ -79,9 +78,6 @@ export default {
         const rotation = await rotate(request, env, ctx);
         return rotation;
         break;
-      case 'test':
-        const test = await getClient('test', env);
-        return new Response(JSON.stringify(test), { status: 200, headers: headers });
       default:
         return new Response(
           JSON.stringify({

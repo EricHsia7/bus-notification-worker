@@ -8,7 +8,7 @@ const createClientTable = `CREATE TABLE IF NOT EXISTS "Client" (
   "TimeStamp" INTEGER NULL
 );`;
 
-export const ClientIDRegularExpression = /^(client_)([A-Za-z0-9_-]{32,32})$/gm
+export const ClientIDRegularExpression = /^(client_)([A-Za-z0-9_-]{32,32})$/gm;
 
 export interface NClientBackend {
   Number: number;
@@ -26,7 +26,7 @@ const createScheduleTable = `CREATE TABLE IF NOT EXISTS "Schedule" (
   "TimeStamp" INTEGER NULL
 );`;
 
-export const ScheduleIDRegularExpression = /^(schedule_)([A-Za-z0-9_-]{32,32})$/gm
+export const ScheduleIDRegularExpression = /^(schedule_)([A-Za-z0-9_-]{32,32})$/gm;
 
 export interface NScheduleBackend {
   Number: number;
@@ -68,9 +68,8 @@ export async function getClient(client_id: NClientBackend['ClientID'], env: Env)
   const { results } = (await env.DB.prepare(selectClient).bind(client_id).all()) as Array<NClientBackend>;
   if (results.length > 0) {
     return results[0];
-  }
-  else {
-    return false
+  } else {
+    return false;
   }
 }
 
@@ -100,4 +99,16 @@ export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], c
   const insertSchedule = `INSERT INTO "Schedule" ("ScheduleID", "ClientID", "Message", "ScheduledTime", "TimeStamp") VALUES (?, ?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
   await env.DB.prepare(insertSchedule).bind(schedule_id, client_id, message, scheduled_time, timeStamp).run();
+}
+
+export async function listSchedules(deadline: number, env: Env): Promise<Array<NScheduleBackend>> {
+  const selectSchedule = `SELECT * FROM "Schedule" WHERE ScheduledTime <= ?`;
+  const { results } = (await env.DB.prepare(selectSchedule).bind(deadline).all()) as Array<NScheduleBackend>;
+  return results;
+}
+
+export async function discardExpiredSchedules(deadline: number, env: Env) {
+  const deleteSchedule = `DELETE * FROM "Schedule" WHERE ScheduledTime <= ?`;
+  const { results } = (await env.DB.prepare(deleteSchedule).bind(deadline).all()) as Array<NScheduleBackend>;
+  return results;
 }
