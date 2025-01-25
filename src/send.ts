@@ -2,7 +2,7 @@ import { discardExpiredSchedules, listSchedules } from './database';
 import { sendMessageViaTelegram } from './telegram';
 
 export async function send(event, env, ctx) {
-  const now = new Date();
+  const now = new Date().getTime();
   // Retrieve scheduled tasks
   const schedules = await listSchedules(now, env);
   for (const schedule of schedules) {
