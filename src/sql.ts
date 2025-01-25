@@ -2,7 +2,6 @@ import { Env } from '.';
 import { NClientBackend } from './register';
 
 export async function initializeDB(env: Env) {
-  const DB = env.bus_notification_db;
   const createClientTable = `CREATE TABLE IF NOT EXISTS "Client" (
   "Number" INTEGER PRIMARY KEY,
   "ClientID" VARCHAR(50) NULL,
@@ -17,20 +16,18 @@ export async function initializeDB(env: Env) {
   "ScheduledTime" INTEGER NULL,
   "TimeStamp" INTEGER NULL
 );`;
-  await DB.prepare(createClientTable);
-  await DB.prepare(createScheduleTable);
+  await env.DB.prepare(createClientTable);
+  await env.DB.prepare(createScheduleTable);
 }
 
 export async function addClient(client_id: NClientBackend['client_id'], secret: NClientBackend['secret'], env: Env) {
-  const DB = env.bus_notification_db;
   const insertClient = `INSERT INTO "Client" ("ClientID", "Secret", "TimeStamp") VALUES (?, ?, ?);`;
   const timeStamp = new Date().getTime();
-  await DB.prepare(insertClient).bind(client_id, secret, timeStamp);
+  await env.DB.prepare(insertClient).bind(client_id, secret, timeStamp);
 }
 
 export async function getClient(client_id: NClientBackend['client_id'], env: Env): Promise<object> {
-  const DB = env.bus_notification_db;
   const selectClient = `SELECT * FROM Client WHERE ClientID = ?;`;
-  const { results } = await DB.prepare(selectClient).bind(client_id);
+  const { results } = await env.DB.prepare(selectClient).bind(client_id);
   return results;
 }

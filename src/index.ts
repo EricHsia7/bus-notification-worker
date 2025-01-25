@@ -9,7 +9,7 @@ import { getClient } from './sql';
 
 export interface Env {
   bus_notification_kv: KVNamespace;
-  bus_notification_db: D1Database;
+  DB: D1Database;
 }
 
 export type NResponseCode = 200 | 400 | 401 | 404 | 500;
@@ -91,7 +91,7 @@ export default {
         return rotation;
         break;
       case 'test':
-        
+
         const test = await getClient('test', env);
         return JSON.stringify(test);
       default:
