@@ -59,6 +59,13 @@ export async function schedule(request, env, ctx): Promise<Response> {
         };
       }
     }
+  } else {
+    responseObject = {
+      result: 'The client id is invalid.',
+      code: 400,
+      method: 'schedule',
+      schedule_id: 'null'
+    };
   }
 
   return new Response(JSON.stringify(responseObject), {
