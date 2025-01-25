@@ -1,6 +1,6 @@
 import { TOTPPeriod, Env } from './index';
 
-const ClientTableName = 'Client'
+const ClientTableName = 'Client';
 const createClientTable = `CREATE TABLE IF NOT EXISTS "${ClientTableName}" (
   "Number" INTEGER PRIMARY KEY,
   "ClientID" VARCHAR(50) NULL,
@@ -18,12 +18,18 @@ export interface NClientBackend {
   TimeStamp: number;
 }
 
-const ScheduleTableName = 'Schedule'
+const ScheduleTableName = 'Schedule';
 const createScheduleTable = `CREATE TABLE IF NOT EXISTS "${ScheduleTableName}" (
   "Number" INTEGER PRIMARY KEY,
   "ScheduleID" VARCHAR(50) NULL,
   "ClientID" VARCHAR(50) NULL,
-  "Message" VARCHAR(8000) NULL,
+  "StopID" INTEGER NULL,
+  "LocationName" VARCHAR(512) NULL,
+  "RouteID" INTEGER NULL
+  "RouteName" VARCHAR(512) NULL,
+  "Direction" VARCHAR(512) NULL
+  "EstimateTime" INTEGER NULL,
+  "Photo" INTEGER NULL,
   "ScheduledTime" INTEGER NULL,
   "TimeStamp" INTEGER NULL
 );`;
@@ -34,12 +40,18 @@ export interface NScheduleBackend {
   Number: number;
   ScheduleID: string;
   ClientID: NClientBackend['ClientID'];
-  Message: string;
+  StopID: number;
+  LocationName: string;
+  RouteID: number;
+  RouteName: string;
+  Direction: string;
+  EstimateTime: number;
+  Photo: boolean; // 0: false, 1: true
   ScheduledTime: number;
   TimeStamp: number;
 }
 
-const TOTPTokenTableName = 'TOTPToken'
+const TOTPTokenTableName = 'TOTPToken';
 const createTOTPToken = `CREATE TABLE IF NOT EXISTS "${TOTPTokenTableName}" (
   "Number" INTEGER PRIMARY KEY,
   "ClientID" VARCHAR(50) NULL,
@@ -108,10 +120,12 @@ export async function checkTOTPToken(client_id: NClientBackend['ClientID'], toke
   }
 }
 
-export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], message: NScheduleBackend['Message'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
-  const insertSchedule = `INSERT INTO "${ScheduleTableName}" ("ScheduleID", "ClientID", "Message", "ScheduledTime", "TimeStamp") VALUES (?, ?, ?, ?, ?);`;
+export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], stop_id: NScheduleBackend['StopID'], location_name: NScheduleBackend['LocationName'], route_id: NScheduleBackend['RouteID'], route_name: NScheduleBackend['RouteName'], direction: NScheduleBackend['Direction'], estimate_time: NScheduleBackend['EstimateTime'], photo: NScheduleBackend['Photo'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
+  const insertSchedule = `INSERT INTO "${ScheduleTableName}" ("ScheduleID", "ClientID", "StopID", "LocationName", "RouteID", "RouteName", "Direction", "EstimateTime", "Photo", "ScheduledTime", "TimeStamp") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
-  await env.DB.prepare(insertSchedule).bind(schedule_id, client_id, message, scheduled_time, timeStamp).run();
+  await env.DB.prepare(insertSchedule)
+    .bind(schedule_id, client_id, stop_id, location_name, route_id, route_name, direction, estimate_time, photo === true ? 1 : 0, scheduled_time, timeStamp)
+    .run();
 }
 
 export async function getSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], env: Env): Promise<NScheduleBackend | false> {
