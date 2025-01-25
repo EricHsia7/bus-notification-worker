@@ -1,5 +1,5 @@
 import { headers } from '.';
-import { OTPAuthValidate } from './tools';
+import { OTPAuthSecret, OTPAuthValidate } from './tools';
 import { ClientIDRegularExpression, getClient, NClientBackend, NTOTPTokenBackend, setClientSecret } from './database';
 import { NResponseRotate, TOTPSecretSize } from './index';
 
