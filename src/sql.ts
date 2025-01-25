@@ -16,18 +16,18 @@ export async function initializeDB(env: Env) {
   "ScheduledTime" INTEGER NULL,
   "TimeStamp" INTEGER NULL
 );`;
-  await env.DB.prepare(createClientTable);
-  await env.DB.prepare(createScheduleTable);
+  await env.DB.prepare(createClientTable).run();
+  await env.DB.prepare(createScheduleTable).run();
 }
 
 export async function addClient(client_id: NClientBackend['client_id'], secret: NClientBackend['secret'], env: Env) {
   const insertClient = `INSERT INTO "Client" ("ClientID", "Secret", "TimeStamp") VALUES (?, ?, ?);`;
   const timeStamp = new Date().getTime();
-  await env.DB.prepare(insertClient).bind(client_id, secret, timeStamp);
+  await env.DB.prepare(insertClient).bind(client_id, secret, timeStamp).run();
 }
 
 export async function getClient(client_id: NClientBackend['client_id'], env: Env): Promise<object> {
   const selectClient = `SELECT * FROM Client WHERE ClientID = ?;`;
-  const { results } = await env.DB.prepare(selectClient).bind(client_id);
+  const { results } = await env.DB.prepare(selectClient).bind(client_id).all();
   return results;
 }
