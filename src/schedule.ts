@@ -1,24 +1,18 @@
 import { headers, NResponseSchedule } from '.';
-import { NClientBackend } from './register';
 import { generateIdentifier, OTPAuthValidate } from './tools';
-
-export interface Schedule {
-  client_id: NClientBackend['client_id'];
-  message: string;
-  scheduled_time: string;
-}
+import { NClientBackend, NScheduleBackend, NTOTPTokenBackend } from './database';
 
 export async function schedule(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
   const urlParams = url.searchParams;
 
-  const paramClientID = urlParams.get('client_id') as NClientBackend['client_id'];
-  const paramTOTPToken = urlParams.get('totp_token') as string;
-  const paramMessage = urlParams.get('message') as string;
-  const paramScheduledTime = urlParams.get('scheduled_time') as string;
+  const paramClientID = urlParams.get('client_id') as NClientBackend['ClientID'];
+  const paramTOTPToken = urlParams.get('totp_token') as NTOTPTokenBackend['Token'];
+  const paramMessage = urlParams.get('message') as NScheduleBackend['Message'];
+  const paramScheduledTime = new Date(urlParams.get('scheduled_time')).getTime() as NScheduleBackend['ScheduledTime'];
 
   const now = new Date();
-  const scheduleID = generateIdentifier('schedule');
+  const scheduleID = generateIdentifier('schedule') as NScheduleBackend['ScheduleID'];
 
   let responseObject: NResponseSchedule = {
     result: 'There was an unknown error.',
@@ -35,7 +29,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
     if (validation) {
       const scheduledTime = new Date(paramScheduledTime);
       if (scheduledTime.getTime() > now.getTime() + 60 * 3 * 1000) {
-        const scheduleObject: Schedule = {
+        const scheduleObject: NScheduleBackend = {
           client_id: paramClientID,
           message: paramMessage,
           scheduled_time: paramScheduledTime

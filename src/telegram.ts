@@ -1,4 +1,4 @@
-import { NClientBackend } from './register';
+import { NClientBackend } from './database';
 
 export async function checkTelegramBotToken(token: string): Promise<boolean> {
   try {

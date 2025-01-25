@@ -1,5 +1,4 @@
-import { NClientBackend } from './register';
-import { Schedule } from './schedule';
+import { NScheduleBackend } from './database';
 import { sendMessageViaTelegram } from './telegram';
 
 export async function send(event, env, ctx) {
@@ -11,7 +10,7 @@ export async function send(event, env, ctx) {
   for (const schedule of schedules.keys) {
     const scheduleJSON = await env.bus_notification_kv.get(schedule.name);
     if (scheduleJSON) {
-      const scheduleObject = JSON.parse(scheduleJSON) as Schedule;
+      const scheduleObject = JSON.parse(scheduleJSON) as NScheduleBackend;
       const scheduledTime = new Date(scheduleObject.scheduled_time);
       if (now.getTime() >= scheduledTime.getTime()) {
         const clientJSON = await env.bus_notification_kv.get(scheduleObject.client_id);

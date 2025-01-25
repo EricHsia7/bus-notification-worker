@@ -1,7 +1,7 @@
 import { headers, NResponseCancel } from '.';
-import { NClientBackend } from './register';
-import { Schedule } from './schedule';
+import { NScheduleBackend } from './database';
 import { generateIdentifier, OTPAuthValidate } from './tools';
+import { NClientBackend } from './database';
 
 export async function cancel(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
@@ -28,7 +28,7 @@ export async function cancel(request, env, ctx): Promise<Response> {
     if (validation) {
       const scheduleJSON = await env.bus_notification_kv.get(paramScheduleID);
       if (scheduleJSON) {
-        const scheduleObject = JSON.parse(scheduleJSON) as Schedule;
+        const scheduleObject = JSON.parse(scheduleJSON) as NScheduleBackend;
         const scheduledTime = new Date(scheduleObject.scheduled_time);
         if (scheduledTime.getTime() < now.getTime()) {
           await env.bus_notification_kv.delete(scheduleID);

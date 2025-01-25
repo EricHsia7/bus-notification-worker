@@ -1,13 +1,7 @@
 import { headers, NResponseRegister, TOTPSecretSize } from '.';
 import { Env } from './index';
-import { addClient, initializeDB } from './sql';
+import { addClient, initializeDB } from './database';
 import { generateIdentifier, OTPAuthSecret, sha256 } from './tools';
-
-export interface NClientBackend {
-  client_id: string;
-  secret: string;
-  type: 'client';
-}
 
 export async function register(request, env: Env, ctx): Promise<Response> {
   const url = new URL(request.url);

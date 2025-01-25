@@ -4,7 +4,7 @@ import { register } from './register';
 import { rotate } from './rotate';
 import { schedule } from './schedule';
 import { send } from './send';
-import { getClient } from './sql';
+import { getClient } from './database';
 
 export interface Env {
   bus_notification_kv: KVNamespace;
