@@ -51,7 +51,7 @@ To set up this worker on your own Cloudflare account and Telegram bot, you need 
 
 1. Open wrangler.json.
 2. Replace the ID with your own ID copied when you create the DB.
-3. Change the variable **ALLOW_REGISTRATION** to `true`.
+3. Change the variable **ALLOW_REGISTRATION** to `true` to turn on this option.
 4. Commit the changes to **main** branch of the forked repository.
 
 > [!TIP]
