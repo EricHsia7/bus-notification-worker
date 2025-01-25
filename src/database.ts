@@ -9,6 +9,7 @@ const createClientTable = `CREATE TABLE IF NOT EXISTS "Client" (
 );`;
 
 export const ClientIDRegularExpression = /^(client_)([A-Za-z0-9\_\-]{32,32})$/m;
+// Gloab tag would result in altering test results because the worker is alive and does not restart every run
 
 export interface NClientBackend {
   Number: number;
