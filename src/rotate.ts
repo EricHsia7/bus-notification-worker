@@ -48,6 +48,13 @@ export async function rotate(request, env, ctx): Promise<Response> {
         };
       }
     }
+  } else {
+    responseObject = {
+      result: 'The client id is invalid.',
+      code: 400,
+      method: 'rotate',
+      secret: 'null'
+    };
   }
 
   return new Response(JSON.stringify(responseObject), {
