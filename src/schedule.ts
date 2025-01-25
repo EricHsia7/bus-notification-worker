@@ -1,6 +1,6 @@
 import { headers, NResponseSchedule } from '.';
 import { generateIdentifier, OTPAuthValidate } from './tools';
-import { addSchedule, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend } from './database';
+import { addSchedule, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend } from './database';
 
 export async function schedule(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
@@ -21,7 +21,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
     schedule_id: 'null'
   };
 
-  const clientIDTest = /^(client_)([A-Za-z0-9_-]{32,32})$/gm.test(paramClientID);
+  const clientIDTest = ClientIDRegularExpression.test(paramClientID);
   if (clientIDTest) {
     const thisClient = await getClient(paramClientID, env);
     if (typeof thisClient === 'boolean' && thisClient === false) {
@@ -32,7 +32,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
         schedule_id: 'null'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.secret, paramTOTPToken);
+      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
       if (validation) {
         if (paramScheduledTime > now.getTime() + 60 * 3 * 1000) {
           await addSchedule(scheduleID, paramClientID, paramMessage, paramScheduledTime, env);

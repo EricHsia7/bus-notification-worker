@@ -8,6 +8,8 @@ const createClientTable = `CREATE TABLE IF NOT EXISTS "Client" (
   "TimeStamp" INTEGER NULL
 );`;
 
+export const ClientIDRegularExpression = /^(client_)([A-Za-z0-9_-]{32,32})$/gm
+
 export interface NClientBackend {
   Number: number;
   ClientID: string;
@@ -23,6 +25,8 @@ const createScheduleTable = `CREATE TABLE IF NOT EXISTS "Schedule" (
   "ScheduledTime" INTEGER NULL,
   "TimeStamp" INTEGER NULL
 );`;
+
+export const ScheduleIDRegularExpression = /^(schedule_)([A-Za-z0-9_-]{32,32})$/gm
 
 export interface NScheduleBackend {
   Number: number;
