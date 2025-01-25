@@ -1,5 +1,3 @@
-import { NClientBackend } from './database';
-
 export async function checkTelegramBotToken(token: string): Promise<boolean> {
   try {
     const response = await fetch(`https://api.telegram.org/bot${token}/getMe`);
