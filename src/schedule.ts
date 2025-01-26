@@ -1,6 +1,6 @@
 import { headers, NResponseSchedule } from './index';
 import { generateIdentifier, OTPAuthValidate } from './tools';
-import { addSchedule, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken } from './database';
+import { addSchedule, checkTOTPToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken } from './database';
 
 export async function schedule(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
