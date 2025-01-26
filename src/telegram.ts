@@ -33,7 +33,7 @@ export async function sendTextMessageViaTelegram(token: string, chat_id: string,
     throw error;
   }
 }
-
+/*
 export async function sendPhotoMesaageViaTelegram(token: string, chat_id: string, buffer: ArrayBuffer): Promise<object> {
   const telegramAPI = `https://api.telegram.org/bot${token}/sendPhoto`;
   try {
@@ -60,3 +60,4 @@ export async function sendPhotoMesaageViaTelegram(token: string, chat_id: string
     throw error;
   }
 }
+*/

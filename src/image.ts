@@ -1,3 +1,4 @@
+/*
 import { formatTime } from './tools';
 import { NScheduleBackend } from './database';
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
@@ -70,3 +71,4 @@ export async function generateImage(location_name: NScheduleBackend['LocationNam
 
   return ctx.toBuffer('image/png');
 }
+*/
