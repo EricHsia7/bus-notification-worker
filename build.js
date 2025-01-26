@@ -19,7 +19,7 @@ esbuild
     conditions: ['worker', 'browser', 'import', 'production'],
     plugins: [
       esbuildCommonjs({
-        include: ['os']
+        include: ['os', 'os']
       })
     ]
   })
