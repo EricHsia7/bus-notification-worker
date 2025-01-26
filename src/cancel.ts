@@ -1,6 +1,6 @@
 import { headers, NResponseCancel } from './index';
 import { OTPAuthValidate } from './tools';
-import { ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, ScheduleIDRegularExpression } from './database';
+import { checkTOTPToken, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken, ScheduleIDRegularExpression } from './database';
 
 export async function cancel(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
@@ -30,35 +30,45 @@ export async function cancel(request, env, ctx): Promise<Response> {
     } else {
       const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
       if (validation) {
-        const scheduleIDTest = ScheduleIDRegularExpression.test(paramScheduleID);
-        if (scheduleIDTest) {
-          const thisSchedule = await getSchedule(paramScheduleID, thisClient.ClientID, env);
-          if (typeof thisSchedule === 'boolean' && thisSchedule === false) {
-            responseObject = {
-              result: 'The schedule was not found.',
-              code: 404,
-              method: 'cancel'
-            };
-          } else {
-            if (thisSchedule.ScheduledTime > now.getTime()) {
-              await discardSchedule(thisSchedule.ScheduleID, env);
+        await recordTOTPToken(paramClientID, paramTOTPToken, env);
+        const check = await checkTOTPToken(paramClientID, paramTOTPToken, env);
+        if (check) {
+          const scheduleIDTest = ScheduleIDRegularExpression.test(paramScheduleID);
+          if (scheduleIDTest) {
+            const thisSchedule = await getSchedule(paramScheduleID, thisClient.ClientID, env);
+            if (typeof thisSchedule === 'boolean' && thisSchedule === false) {
               responseObject = {
-                result: 'The notification was canceled.',
-                code: 200,
+                result: 'The schedule was not found.',
+                code: 404,
                 method: 'cancel'
               };
             } else {
-              responseObject = {
-                result: 'A notification can only be canceled before it was due.',
-                code: 400,
-                method: 'cancel'
-              };
+              if (thisSchedule.ScheduledTime > now.getTime()) {
+                await discardSchedule(thisSchedule.ScheduleID, env);
+                responseObject = {
+                  result: 'The notification was canceled.',
+                  code: 200,
+                  method: 'cancel'
+                };
+              } else {
+                responseObject = {
+                  result: 'A notification can only be canceled before it was due.',
+                  code: 400,
+                  method: 'cancel'
+                };
+              }
             }
+          } else {
+            responseObject = {
+              result: 'The schedule id is invalid.',
+              code: 400,
+              method: 'cancel'
+            };
           }
         } else {
           responseObject = {
-            result: 'The schedule id is invalid.',
-            code: 400,
+            result: 'The token was used too many times.',
+            code: 403,
             method: 'cancel'
           };
         }

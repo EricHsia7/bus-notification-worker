@@ -1,6 +1,6 @@
 import { headers, NResponseSchedule } from './index';
 import { generateIdentifier, OTPAuthValidate } from './tools';
-import { addSchedule, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend } from './database';
+import { addSchedule, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken } from './database';
 
 export async function schedule(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
@@ -40,20 +40,30 @@ export async function schedule(request, env, ctx): Promise<Response> {
     } else {
       const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
       if (validation) {
-        if (paramScheduledTime > now.getTime() + 60 * 1 * 1000) {
-          await addSchedule(scheduleID, paramClientID, paramStopID, paramLocationName, paramRouteID, paramRouteName, paramDirection, paramEstimateTime, paramTimeFormattingMode, paramScheduledTime, env);
-          responseObject = {
-            result: 'The notification was scheduled.',
-            code: 200,
-            method: 'schedule',
-            schedule_id: scheduleID
-          };
+        await recordTOTPToken(paramClientID, paramTOTPToken, env);
+        const check = await checkTOTPToken(paramClientID, paramTOTPToken, env);
+        if (check) {
+          if (paramScheduledTime > now.getTime() + 60 * 1 * 1000) {
+            await addSchedule(scheduleID, paramClientID, paramStopID, paramLocationName, paramRouteID, paramRouteName, paramDirection, paramEstimateTime, paramTimeFormattingMode, paramScheduledTime, env);
+            responseObject = {
+              result: 'The notification was scheduled.',
+              code: 200,
+              method: 'schedule',
+              schedule_id: scheduleID
+            };
+          } else {
+            responseObject = {
+              result: 'The scheduled time shall be at least 1 minute after.',
+              code: 400,
+              method: 'schedule',
+              schedule_id: 'null'
+            };
+          }
         } else {
           responseObject = {
-            result: 'The scheduled time shall be at least 1 minute after.',
-            code: 400,
-            method: 'schedule',
-            schedule_id: 'null'
+            result: 'The token was used too many times.',
+            code: 403,
+            method: 'schedule'
           };
         }
       } else {

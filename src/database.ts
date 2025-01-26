@@ -1,4 +1,5 @@
-import { TOTPPeriod, Env } from './index';
+import { TOTPPeriod, Env, TOTPUsageLimit } from './index';
+import { sha256 } from './tools';
 
 const ClientTableName = 'Client';
 const createClientTable = `CREATE TABLE IF NOT EXISTS "${ClientTableName}" (
@@ -54,15 +55,19 @@ export interface NScheduleBackend {
 const TOTPTokenTableName = 'TOTPToken';
 const createTOTPToken = `CREATE TABLE IF NOT EXISTS "${TOTPTokenTableName}" (
   "Number" INTEGER PRIMARY KEY,
+  "Hash" CHAR(64) UNIQUE,
   "ClientID" VARCHAR(50) NULL,
   "Token" CHAR(8) NULL,
+  "Count" INTEGER DEFAULT 0,
   "TimeStamp" INTEGER NULL
 );`;
 
 export interface NTOTPTokenBackend {
   Number: number;
+  Hash: string;
   ClientID: NClientBackend['ClientID'];
   Token: string;
+  Count: number;
   TimeStamp: number;
 }
 
@@ -98,10 +103,13 @@ export async function setClientSecret(client_id: NClientBackend['ClientID'], new
   await env.DB.prepare(updateSecret).bind(newSecret, timeStamp, client_id).run();
 }
 
-export async function recordTOTPToken(token: NTOTPTokenBackend['Token'], env: Env) {
-  const insertTOTPToken = `INSERT INTO "${TOTPTokenTableName}" ("ClientID", "Token", "TimeStamp") VALUES (?, ?, ?);`;
+export async function recordTOTPToken(client_id: NClientBackend['ClientID'], token: NTOTPTokenBackend['Token'], env: Env) {
+  const insertTOTPToken = `INSERT OR IGNORE INTO "${TOTPTokenTableName}" ("Hash", "ClientID", "Token", "TimeStamp") VALUES (?, ?, ?, ?);`;
+  const updateTOTPToken = `UPDATE "${TOTPTokenTableName}" SET "Count" = "Count" + 1 WHERE Hash = ?;`;
   const timeStamp = new Date().getTime();
-  await env.DB.prepare(insertTOTPToken).bind(client_id, token, timeStamp).run();
+  const hash = sha256(`${token}${client_id}${token}`);
+  await env.DB.prepare(insertTOTPToken).bind(hash, client_id, token, timeStamp).run();
+  await env.DB.prepare(updateTOTPToken).bind(hash).run();
 }
 
 export async function discardExpiredTOTPToken(env: Env) {
@@ -110,13 +118,15 @@ export async function discardExpiredTOTPToken(env: Env) {
   await env.DB.prepare(deleteTOTPToken).bind(deadline).run();
 }
 
-export async function checkTOTPToken(client_id: NClientBackend['ClientID'], token: NTOTPTokenBackend['Token'], env: Env): Promise<boolean> {
-  const selectTOTPToken = `SELECT * FROM "${TOTPTokenTableName}" WHERE ClientID = ? AND Token = ?`;
-  const { results } = await env.DB.prepare(selectTOTPToken).bind(client_id, token).run();
+export async function checkTOTPToken(client_id: NTOTPTokenBackend['ClientID'], token: NTOTPTokenBackend['Token'], env: Env): Promise<boolean> {
+  const selectTOTPToken = `SELECT "Count" FROM "${TOTPTokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count >= ?`;
+  const deadline = new Date().getTime() - TOTPPeriod * 3 * 1000;
+  const hash = sha256(`${token}${client_id}${token}`);
+  const { results } = (await env.DB.prepare(selectTOTPToken).bind(deadline, hash, TOTPUsageLimit).all()) as Array<NTOTPTokenBackend>;
   if (results.length > 0) {
-    return true;
-  } else {
     return false;
+  } else {
+    return true;
   }
 }
 
