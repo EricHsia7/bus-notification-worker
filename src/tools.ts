@@ -2,6 +2,7 @@ import * as OTPAuth from 'otpauth';
 import { NClientBackend } from './database';
 import { TOTPDigits, TOTPPeriod } from './index';
 
+export const { createCanvas, loadImage } = require('canvas');
 export const sha256 = require('sha256');
 
 export function OTPAuthSecret(size: number): string {

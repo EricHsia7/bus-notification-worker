@@ -1,5 +1,6 @@
 import { discardExpiredSchedules, listSchedules } from './database';
-import { sendTextMessageViaTelegram } from './telegram';
+import { generateImage } from './image';
+import { sendPhotoMesaageViaTelegram, sendTextMessageViaTelegram } from './telegram';
 import { formatTime } from './tools';
 
 export async function send(event, env, ctx) {
@@ -8,9 +9,10 @@ export async function send(event, env, ctx) {
   const schedules = await listSchedules(now, env);
   for (const schedule of schedules) {
     const time = (schedule.TimeStamp + schedule.EstimateTime * 1000 - now) / 1000;
-    const message = `[到站通知] 公車將在${formatTime(time, schedule.TimeFormattingMode)}內抵達${schedule.LocationName} | 路線：${schedule.RouteName} - 往${schedule.Direction}`;
+    const message = `公車將在${formatTime(time, schedule.TimeFormattingMode)}內抵達${schedule.LocationName} | 路線：${schedule.RouteName} - 往${schedule.Direction}`;
     if (schedule.Photo === 1) {
-      await sendTextMessageViaTelegram(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, 'Not supported.');
+      const buffer = await generateImage(schedule.LocationName, schedule.RouteName, schedule.Direction, time, schedule.TimeFormattingMode);
+      await sendPhotoMesaageViaTelegram(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, buffer);
     } else {
       await sendTextMessageViaTelegram(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, message);
     }
