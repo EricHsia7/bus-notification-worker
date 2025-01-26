@@ -20,7 +20,7 @@
   "dependencies": {
     "otpauth": "^9.3.6",
     "sha256": "^0.2.0",
-    "canvas": "^3.1.0",
+    "@napi-rs/canvas": "^0.1.65",
     "formdata-node": "^6.0.3"
   }
 }

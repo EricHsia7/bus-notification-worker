@@ -1,6 +1,6 @@
-import { createCanvas, formatTime } from './tools';
+import { formatTime } from './tools';
 import { NScheduleBackend } from './database';
-import { createCanvas } from 'canvas/index.js';
+const { createCanvas, loadImage } = require('@napi-rs/canvas');
 
 export async function generateImage(location_name: NScheduleBackend['LocationName'], route_name: NScheduleBackend['RouteName'], direction: NScheduleBackend['Direction'], time: number, time_formatting_mode: NScheduleBackend['TimeFormattingMode']): Promise<ArrayBuffer> {
   const width = 1280;
@@ -68,14 +68,5 @@ export async function generateImage(location_name: NScheduleBackend['LocationNam
     offsetX += Math.max(nameWidth + attribute_icon_width, valueWidth) + attribute_padding;
   }
 
-  const buffer = await new Promise((resolve, reject) => {
-    canvas.toBuffer((err, buf) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(buf);
-      }
-    });
-  });
-  return buffer;
+  return ctx.toBuffer('image/png');
 }
