@@ -1,4 +1,3 @@
-import { FormData } from 'formdata-node';
 
 export async function checkTelegramBotToken(token: string): Promise<boolean> {
   try {

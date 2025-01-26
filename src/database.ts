@@ -29,7 +29,6 @@ const createScheduleTable = `CREATE TABLE IF NOT EXISTS "${ScheduleTableName}" (
   "RouteName" VARCHAR(512) NULL,
   "Direction" VARCHAR(512) NULL,
   "EstimateTime" INTEGER NULL,
-  "Photo" INTEGER NULL,
   "TimeFormattingMode" INTEGER NULL,
   "ScheduledTime" INTEGER NULL,
   "TimeStamp" INTEGER NULL
@@ -47,7 +46,6 @@ export interface NScheduleBackend {
   RouteName: string;
   Direction: string;
   EstimateTime: number;
-  Photo: boolean; // 0: false, 1: true
   TimeFormattingMode: number;
   ScheduledTime: number;
   TimeStamp: number;
@@ -122,7 +120,7 @@ export async function checkTOTPToken(client_id: NClientBackend['ClientID'], toke
   }
 }
 
-export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], stop_id: NScheduleBackend['StopID'], location_name: NScheduleBackend['LocationName'], route_id: NScheduleBackend['RouteID'], route_name: NScheduleBackend['RouteName'], direction: NScheduleBackend['Direction'], estimate_time: NScheduleBackend['EstimateTime'], photo: NScheduleBackend['Photo'], time_formatting_mode: NScheduleBackend['TimeFormattingMode'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
+export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], stop_id: NScheduleBackend['StopID'], location_name: NScheduleBackend['LocationName'], route_id: NScheduleBackend['RouteID'], route_name: NScheduleBackend['RouteName'], direction: NScheduleBackend['Direction'], estimate_time: NScheduleBackend['EstimateTime'], time_formatting_mode: NScheduleBackend['TimeFormattingMode'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
   const insertSchedule = `INSERT INTO
   "${ScheduleTableName}" (
     "ScheduleID",
@@ -133,16 +131,15 @@ export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], c
     "RouteName",
     "Direction",
     "EstimateTime",
-    "Photo",
     "TimeFormattingMode",
     "ScheduledTime",
     "TimeStamp"
   )
 VALUES
-  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
   await env.DB.prepare(insertSchedule)
-    .bind(schedule_id, client_id, stop_id, location_name, route_id, route_name, direction, estimate_time, photo === true ? 1 : 0, time_formatting_mode, scheduled_time, timeStamp)
+    .bind(schedule_id, client_id, stop_id, location_name, route_id, route_name, direction, estimate_time, time_formatting_mode, scheduled_time, timeStamp)
     .run();
 }
 

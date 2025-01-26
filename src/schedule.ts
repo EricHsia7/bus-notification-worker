@@ -14,7 +14,6 @@ export async function schedule(request, env, ctx): Promise<Response> {
   const paramRouteName = urlParams.get('route_name') as NScheduleBackend['RouteName'];
   const paramDirection = urlParams.get('direction') as NScheduleBackend['Direction'];
   const paramEstimateTime = parseInt(urlParams.get('estimate_time')) as NScheduleBackend['EstimateTime'];
-  const paramPhoto = (urlParams.get('photo') === 'true' ? true : false) as NScheduleBackend['Photo'];
   const paramTimeFormattingMode = parseInt(urlParams.get('time_formatting_mode')) as NScheduleBackend['TimeFormattingMode'];
   const paramScheduledTime = new Date(urlParams.get('scheduled_time')).getTime() as NScheduleBackend['ScheduledTime'];
 
@@ -42,7 +41,7 @@ export async function schedule(request, env, ctx): Promise<Response> {
       const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
       if (validation) {
         if (paramScheduledTime > now.getTime() + 60 * 1 * 1000) {
-          await addSchedule(scheduleID, paramClientID, paramStopID, paramLocationName, paramRouteID, paramRouteName, paramDirection, paramEstimateTime, paramPhoto, paramTimeFormattingMode, paramScheduledTime, env);
+          await addSchedule(scheduleID, paramClientID, paramStopID, paramLocationName, paramRouteID, paramRouteName, paramDirection, paramEstimateTime, paramTimeFormattingMode, paramScheduledTime, env);
           responseObject = {
             result: 'The notification was scheduled.',
             code: 200,
