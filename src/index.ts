@@ -4,7 +4,6 @@ import { register } from './register';
 import { rotate } from './rotate';
 import { schedule } from './schedule';
 import { send } from './send';
-import { image } from './image';
 
 export interface Env {
   DB: D1Database;
@@ -77,10 +76,6 @@ export default {
       case 'rotate':
         const rotation = await rotate(request, env, ctx);
         return rotation;
-        break;
-      case 'image':
-        const imageResult = await image(request, env, ctx);
-        return imageResult;
         break;
       default:
         return new Response(
