@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "private": false,
+  "main": "./src/index.ts",
   "scripts": {
     "build": "node build.js"
   },
