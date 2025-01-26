@@ -112,9 +112,9 @@ export async function recordTOTPToken(client_id: NClientBackend['ClientID'], tok
   await env.DB.prepare(updateTOTPToken).bind(hash).run();
 }
 
-export async function discardExpiredTOTPToken(env: Env) {
+export async function discardExpiredTOTPToken(now: number, env: Env) {
   const deleteTOTPToken = `DELETE FROM "${TOTPTokenTableName}" WHERE TimeStamp < ?`;
-  const deadline = new Date().getTime() - TOTPPeriod * 3 * 1000;
+  const deadline = now - TOTPPeriod * 3 * 1000;
   await env.DB.prepare(deleteTOTPToken).bind(deadline).run();
 }
 
