@@ -20,7 +20,8 @@
   "devDependencies": {
     "wrangler": "^3.103.2",
     "@cloudflare/workers-types": "^4.20250124.3",
-    "esbuild": "^0.24.2"
+    "esbuild": "^0.24.2",
+    "@originjs/vite-plugin-commonjs": "^1.0.3"
   },
   "dependencies": {
     "otpauth": "^9.3.6",

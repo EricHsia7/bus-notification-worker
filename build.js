@@ -1,4 +1,5 @@
 const esbuild = require('esbuild');
+const { esbuildCommonjs } = require('@originjs/vite-plugin-commonjs');
 
 esbuild
   .build({
@@ -15,6 +16,11 @@ esbuild
     minify: true,
     resolveExtensions: ['.tsx', '.ts', '.jsx', '.mjs', '.js', '.json'],
     mainFields: ['worker', 'browser', 'module', 'jsnext', 'main'],
-    conditions: ['worker', 'browser', 'import', 'production']
+    conditions: ['worker', 'browser', 'import', 'production'],
+    plugins: [
+      esbuildCommonjs({
+        include: ['os']
+      })
+    ]
   })
   .catch(() => process.exit(1));
