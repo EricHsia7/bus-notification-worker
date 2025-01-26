@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "",
   "private": false,
+  "scripts": {
+    "build": "node build.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/EricHsia7/bus-notification-worker.git"
@@ -15,7 +18,8 @@
   "homepage": "https://erichsia7.github.io/bus-notification-worker/",
   "devDependencies": {
     "wrangler": "^3.103.2",
-    "@cloudflare/workers-types": "^4.20250124.3"
+    "@cloudflare/workers-types": "^4.20250124.3",
+    "esbuild": "^0.24.2"
   },
   "dependencies": {
     "otpauth": "^9.3.6",
