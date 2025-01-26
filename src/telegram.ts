@@ -1,4 +1,3 @@
-
 export async function checkTelegramBotToken(token: string): Promise<boolean> {
   try {
     const response = await fetch(`https://api.telegram.org/bot${token}/getMe`);
@@ -9,7 +8,7 @@ export async function checkTelegramBotToken(token: string): Promise<boolean> {
   }
 }
 
-export async function sendTextMessageViaTelegram(token: string, chat_id: string, message: string): Promise<object> {
+export async function sendTextMessageViaTelegram(token: string, chat_id: string, message: string, url: string): Promise<object> {
   const telegramAPI = `https://api.telegram.org/bot${token}/sendMessage`;
   try {
     const response = await fetch(telegramAPI, {
@@ -19,7 +18,10 @@ export async function sendTextMessageViaTelegram(token: string, chat_id: string,
       },
       body: JSON.stringify({
         chat_id: chat_id,
-        text: message
+        text: message,
+        reply_markup: {
+          inline_keyboard: [[{ text: '在Bus中查看', url: url }]]
+        }
       })
     });
 
@@ -32,31 +34,3 @@ export async function sendTextMessageViaTelegram(token: string, chat_id: string,
     throw error;
   }
 }
-/*
-export async function sendPhotoMesaageViaTelegram(token: string, chat_id: string, buffer: ArrayBuffer): Promise<object> {
-  const telegramAPI = `https://api.telegram.org/bot${token}/sendPhoto`;
-  try {
-    // Create a FormData instance
-    const formData = new FormData();
-    formData.set('chat_id', chat_id);
-    formData.set('photo', buffer);
-
-    // Send the POST request to Telegram API
-    const response = fetch(telegramAPI, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to send message: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw error;
-  }
-}
-*/
