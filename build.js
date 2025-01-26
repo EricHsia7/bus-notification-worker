@@ -17,10 +17,6 @@ esbuild
     resolveExtensions: ['.tsx', '.ts', '.jsx', '.mjs', '.js', '.json'],
     mainFields: ['worker', 'browser', 'module', 'jsnext', 'main'],
     conditions: ['worker', 'browser', 'import', 'production'],
-    plugins: [
-      esbuildCommonjs({
-        include: ['os', 'os']
-      })
-    ]
+    plugins: [esbuildCommonjs()]
   })
   .catch(() => process.exit(1));
