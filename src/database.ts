@@ -138,9 +138,7 @@ export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], c
 VALUES
   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
-  await env.DB.prepare(insertSchedule)
-    .bind(schedule_id, client_id, stop_id, location_name, route_id, route_name, direction, estimate_time, time_formatting_mode, scheduled_time, timeStamp)
-    .run();
+  await env.DB.prepare(insertSchedule).bind(schedule_id, client_id, stop_id, location_name, route_id, route_name, direction, estimate_time, time_formatting_mode, scheduled_time, timeStamp).run();
 }
 
 export async function getSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], env: Env): Promise<NScheduleBackend | false> {
@@ -151,6 +149,15 @@ export async function getSchedule(schedule_id: NScheduleBackend['ScheduleID'], c
   } else {
     return false;
   }
+}
+
+export async function modifySchedule(schedule_id: NScheduleBackend['ScheduleID'], estimate_time: NScheduleBackend['EstimateTime'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
+  const updateSchedule = `
+  UPDATE "${ScheduleTableName}"
+  SET "EstimateTime" = ?, "ScheduledTime" = ?, "TimeStamp" = ?
+  WHERE ScheduleID = ?`;
+  const timeStamp = new Date().getTime();
+  await env.DB.prepare(updateSchedule).bind(estimate_time, scheduled_time, timeStamp, schedule_id).run();
 }
 
 export async function discardSchedule(schedule_id: NScheduleBackend['ScheduleID'], env: Env) {

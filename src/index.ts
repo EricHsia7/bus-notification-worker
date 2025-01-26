@@ -4,6 +4,7 @@ import { register } from './register';
 import { rotate } from './rotate';
 import { schedule } from './schedule';
 import { send } from './send';
+import { reschedule } from './reschedule';
 
 export interface Env {
   DB: D1Database;
@@ -39,7 +40,13 @@ export interface NResponseRotate {
   secret: string | 'null';
 }
 
-export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate;
+export interface NResponseReschedule {
+  result: string;
+  code: NResponseCode;
+  method: 'reschedule';
+}
+
+export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate | NResponseReschedule;
 
 export const headers = {
   'Content-Type': 'application/json',
@@ -76,6 +83,10 @@ export default {
       case 'rotate':
         const rotation = await rotate(request, env, ctx);
         return rotation;
+        break;
+      case 'reschedule':
+        const rescheduling = await reschedule(request, env, ctx);
+        return rescheduling;
         break;
       default:
         return new Response(

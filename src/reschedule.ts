@@ -1,21 +1,23 @@
-import { headers, NResponseCancel } from './index';
+import { headers, NResponseReschedule } from './index';
 import { OTPAuthValidate } from './tools';
-import { ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, ScheduleIDRegularExpression } from './database';
+import { ClientIDRegularExpression, getClient, getSchedule, modifySchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, ScheduleIDRegularExpression } from './database';
 
-export async function cancel(request, env, ctx): Promise<Response> {
+export async function reschedule(request, env, ctx): Promise<Response> {
   const url = new URL(request.url);
   const urlParams = url.searchParams;
 
   const paramClientID = urlParams.get('client_id') as NClientBackend['ClientID'];
   const paramTOTPToken = urlParams.get('totp_token') as NTOTPTokenBackend['Token'];
   const paramScheduleID = urlParams.get('schedule_id') as NScheduleBackend['ScheduleID'];
+  const paramEstimateTime = parseInt(urlParams.get('estimate_time')) as NScheduleBackend['EstimateTime'];
+  const paramScheduledTime = new Date(urlParams.get('scheduled_time')).getTime() as NScheduleBackend['ScheduledTime'];
 
   const now = new Date();
 
-  let responseObject: NResponseCancel = {
+  let responseObject: NResponseReschedule = {
     result: 'There was an unknown error.',
     code: 500,
-    method: 'cancel'
+    method: 'reschedule'
   };
 
   const clientIDTest = ClientIDRegularExpression.test(paramClientID);
@@ -25,7 +27,7 @@ export async function cancel(request, env, ctx): Promise<Response> {
       responseObject = {
         result: 'The client was not found.',
         code: 404,
-        method: 'cancel'
+        method: 'reschedule'
       };
     } else {
       const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
@@ -37,21 +39,21 @@ export async function cancel(request, env, ctx): Promise<Response> {
             responseObject = {
               result: 'The schedule was not found.',
               code: 404,
-              method: 'cancel'
+              method: 'reschedule'
             };
           } else {
             if (thisSchedule.ScheduledTime > now.getTime()) {
-              await discardSchedule(thisSchedule.ScheduleID, env);
+              await modifySchedule(thisSchedule.ScheduleID, paramEstimateTime, paramScheduledTime, env);
               responseObject = {
-                result: 'The notification was canceled.',
+                result: 'The notification was rescheduled.',
                 code: 200,
-                method: 'cancel'
+                method: 'reschedule'
               };
             } else {
               responseObject = {
-                result: 'A notification can only be canceled before it was due.',
+                result: 'A notification can only be rescheduled before it was due.',
                 code: 400,
-                method: 'cancel'
+                method: 'reschedule'
               };
             }
           }
@@ -59,14 +61,14 @@ export async function cancel(request, env, ctx): Promise<Response> {
           responseObject = {
             result: 'The schedule id is invalid.',
             code: 400,
-            method: 'cancel'
+            method: 'reschedule'
           };
         }
       } else {
         responseObject = {
           result: 'The request was unauthorized.',
           code: 403,
-          method: 'cancel'
+          method: 'reschedule'
         };
       }
     }
@@ -74,7 +76,7 @@ export async function cancel(request, env, ctx): Promise<Response> {
     responseObject = {
       result: 'The client id is invalid.',
       code: 400,
-      method: 'cancel'
+      method: 'reschedule'
     };
   }
 
