@@ -49,6 +49,7 @@ export interface NResponseReschedule {
 export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate | NResponseReschedule;
 
 export const headers = {
+  'Accept': 'application/json',
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -68,40 +69,56 @@ export default {
     const url_params = url.searchParams;
     const param_method = url_params.get('method');
 
-    switch (param_method) {
-      case 'register':
-        const registration = await register(request, env, ctx);
-        return registration;
-        break;
-      case 'schedule':
-        const scheduling = await schedule(request, env, ctx);
-        return scheduling;
-        break;
-      case 'cancel':
-        const cancellation = await cancel(request, env, ctx);
-        return cancellation;
-        break;
-      case 'rotate':
-        const rotation = await rotate(request, env, ctx);
-        return rotation;
-        break;
-      case 'reschedule':
-        const rescheduling = await reschedule(request, env, ctx);
-        return rescheduling;
-        break;
-      default:
-        return new Response(
-          JSON.stringify({
-            result: `The method '${param_method}' is unsupported.`,
-            code: 400,
-            method: param_method
-          }),
-          {
-            status: 200,
-            headers: headers
-          }
-        );
-        break;
+    const contentType = request.headers.get('content-type');
+    if (contentType.includes('application/json')) {
+      const requestBody = await request.json();
+      switch (param_method) {
+        case 'register':
+          const registration = await register(request, requestBody, env, ctx);
+          return registration;
+          break;
+        case 'schedule':
+          const scheduling = await schedule(request, requestBody, env, ctx);
+          return scheduling;
+          break;
+        case 'cancel':
+          const cancellation = await cancel(request, requestBody, env, ctx);
+          return cancellation;
+          break;
+        case 'rotate':
+          const rotation = await rotate(request, requestBody, env, ctx);
+          return rotation;
+          break;
+        case 'reschedule':
+          const rescheduling = await reschedule(request, requestBody, env, ctx);
+          return rescheduling;
+          break;
+        default:
+          return new Response(
+            JSON.stringify({
+              result: `The method '${param_method}' is unsupported.`,
+              code: 400,
+              method: param_method
+            }),
+            {
+              status: 200,
+              headers: headers
+            }
+          );
+          break;
+      }
+    } else {
+      return new Response(
+        JSON.stringify({
+          result: `The method '${param_method}' is unsupported.`,
+          code: 400,
+          method: param_method
+        }),
+        {
+          status: 200,
+          headers: headers
+        }
+      );
     }
   },
   async scheduled(event, env, ctx) {

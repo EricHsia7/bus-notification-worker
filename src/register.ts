@@ -2,11 +2,8 @@ import { headers, NResponseRegister, TOTPSecretSize, Env } from './index';
 import { addClient, initializeDB } from './database';
 import { generateIdentifier, OTPAuthSecret, sha256 } from './tools';
 
-export async function register(request, env: Env, ctx): Promise<Response> {
-  const url = new URL(request.url);
-  const urlParams = url.searchParams;
-
-  const paramHash = urlParams.get('hash');
+export async function register(request, requestBody, env: Env, ctx): Promise<Response> {
+  const reqHash = requestBody.hash;
 
   const clientID = generateIdentifier('client');
   const TOTPSecret = OTPAuthSecret(TOTPSecretSize);
@@ -28,7 +25,7 @@ export async function register(request, env: Env, ctx): Promise<Response> {
   };
 
   if (String(env.ALLOW_REGISTRATION).toLowerCase() === 'true') {
-    if (paramHash === envHash_previous || paramHash === envHash_current || paramHash === envHash_next) {
+    if (reqHash === envHash_previous || reqHash === envHash_current || reqHash === envHash_next) {
       await initializeDB(env);
       await addClient(clientID, TOTPSecret, env);
       responseObject = {

@@ -2,12 +2,9 @@ import { headers, NResponseRotate, TOTPSecretSize } from './index';
 import { OTPAuthSecret, OTPAuthValidate } from './tools';
 import { checkTOTPToken, ClientIDRegularExpression, getClient, NClientBackend, NTOTPTokenBackend, recordTOTPToken, setClientSecret } from './database';
 
-export async function rotate(request, env, ctx): Promise<Response> {
-  const url = new URL(request.url);
-  const urlParams = url.searchParams;
-
-  const paramClientID = urlParams.get('client_id') as NClientBackend['ClientID'];
-  const paramTOTPToken = urlParams.get('totp_token') as NTOTPTokenBackend['Token'];
+export async function rotate(request, requestBody, env, ctx): Promise<Response> {
+  const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
+  const reqTOTPToken = requestBody.totp_token as NTOTPTokenBackend['Token'];
 
   const TOTPSecret = OTPAuthSecret(TOTPSecretSize);
 
@@ -18,9 +15,9 @@ export async function rotate(request, env, ctx): Promise<Response> {
     secret: 'null'
   };
 
-  const clientIDTest = ClientIDRegularExpression.test(paramClientID);
+  const clientIDTest = ClientIDRegularExpression.test(reqClientID);
   if (clientIDTest) {
-    const thisClient = await getClient(paramClientID, env);
+    const thisClient = await getClient(reqClientID, env);
     if (typeof thisClient === 'boolean' && thisClient === false) {
       responseObject = {
         result: 'The client was not found.',
@@ -29,10 +26,10 @@ export async function rotate(request, env, ctx): Promise<Response> {
         secret: 'null'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
+      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, reqTOTPToken);
       if (validation) {
-        await recordTOTPToken(paramClientID, paramTOTPToken, env);
-        const check = await checkTOTPToken(paramClientID, paramTOTPToken, env);
+        await recordTOTPToken(reqClientID, reqTOTPToken, env);
+        const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
         if (check) {
           await setClientSecret(thisClient.ClientID, TOTPSecret, env);
           responseObject = {

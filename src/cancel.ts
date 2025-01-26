@@ -2,13 +2,10 @@ import { headers, NResponseCancel } from './index';
 import { OTPAuthValidate } from './tools';
 import { checkTOTPToken, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken, ScheduleIDRegularExpression } from './database';
 
-export async function cancel(request, env, ctx): Promise<Response> {
-  const url = new URL(request.url);
-  const urlParams = url.searchParams;
-
-  const paramClientID = urlParams.get('client_id') as NClientBackend['ClientID'];
-  const paramTOTPToken = urlParams.get('totp_token') as NTOTPTokenBackend['Token'];
-  const paramScheduleID = urlParams.get('schedule_id') as NScheduleBackend['ScheduleID'];
+export async function cancel(request, requestBody, env, ctx): Promise<Response> {
+  const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
+  const reqTOTPToken = requestBody.totp_token as NTOTPTokenBackend['Token'];
+  const reqScheduleID = requestBody.schedule_id as NScheduleBackend['ScheduleID'];
 
   const now = new Date();
 
@@ -18,9 +15,9 @@ export async function cancel(request, env, ctx): Promise<Response> {
     method: 'cancel'
   };
 
-  const clientIDTest = ClientIDRegularExpression.test(paramClientID);
+  const clientIDTest = ClientIDRegularExpression.test(reqClientID);
   if (clientIDTest) {
-    const thisClient = await getClient(paramClientID, env);
+    const thisClient = await getClient(reqClientID, env);
     if (typeof thisClient === 'boolean' && thisClient === false) {
       responseObject = {
         result: 'The client was not found.',
@@ -28,14 +25,14 @@ export async function cancel(request, env, ctx): Promise<Response> {
         method: 'cancel'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
+      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, reqTOTPToken);
       if (validation) {
-        await recordTOTPToken(paramClientID, paramTOTPToken, env);
-        const check = await checkTOTPToken(paramClientID, paramTOTPToken, env);
+        await recordTOTPToken(reqClientID, reqTOTPToken, env);
+        const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
         if (check) {
-          const scheduleIDTest = ScheduleIDRegularExpression.test(paramScheduleID);
+          const scheduleIDTest = ScheduleIDRegularExpression.test(reqScheduleID);
           if (scheduleIDTest) {
-            const thisSchedule = await getSchedule(paramScheduleID, thisClient.ClientID, env);
+            const thisSchedule = await getSchedule(reqScheduleID, thisClient.ClientID, env);
             if (typeof thisSchedule === 'boolean' && thisSchedule === false) {
               responseObject = {
                 result: 'The schedule was not found.',

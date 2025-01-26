@@ -2,20 +2,17 @@ import { headers, NResponseSchedule } from './index';
 import { generateIdentifier, OTPAuthValidate } from './tools';
 import { addSchedule, checkTOTPToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken } from './database';
 
-export async function schedule(request, env, ctx): Promise<Response> {
-  const url = new URL(request.url);
-  const urlParams = url.searchParams;
-
-  const paramClientID = urlParams.get('client_id') as NClientBackend['ClientID'];
-  const paramTOTPToken = urlParams.get('totp_token') as NTOTPTokenBackend['Token'];
-  const paramStopID = parseInt(urlParams.get('stop_id')) as NScheduleBackend['StopID'];
-  const paramLocationName = urlParams.get('location_name') as NScheduleBackend['LocationName'];
-  const paramRouteID = parseInt(urlParams.get('route_id')) as NScheduleBackend['RouteID'];
-  const paramRouteName = urlParams.get('route_name') as NScheduleBackend['RouteName'];
-  const paramDirection = urlParams.get('direction') as NScheduleBackend['Direction'];
-  const paramEstimateTime = parseInt(urlParams.get('estimate_time')) as NScheduleBackend['EstimateTime'];
-  const paramTimeFormattingMode = parseInt(urlParams.get('time_formatting_mode')) as NScheduleBackend['TimeFormattingMode'];
-  const paramScheduledTime = new Date(urlParams.get('scheduled_time')).getTime() as NScheduleBackend['ScheduledTime'];
+export async function schedule(request, requestBody, env, ctx): Promise<Response> {
+  const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
+  const reqTOTPToken = requestBody.totp_token as NTOTPTokenBackend['Token'];
+  const reqStopID = requestBody.stop_id as NScheduleBackend['StopID'];
+  const reqLocationName = requestBody.location_name as NScheduleBackend['LocationName'];
+  const reqRouteID = requestBody.route_id as NScheduleBackend['RouteID'];
+  const reqRouteName = requestBody.route_name as NScheduleBackend['RouteName'];
+  const reqDirection = requestBody.direction as NScheduleBackend['Direction'];
+  const reqEstimateTime = requestBody.estimate_time as NScheduleBackend['EstimateTime'];
+  const reqTimeFormattingMode = requestBody.time_formatting_mode as NScheduleBackend['TimeFormattingMode'];
+  const reqScheduledTime = new Date(requestBody.scheduled_time).getTime() as NScheduleBackend['ScheduledTime'];
 
   const now = new Date();
   const scheduleID = generateIdentifier('schedule') as NScheduleBackend['ScheduleID'];
@@ -27,9 +24,9 @@ export async function schedule(request, env, ctx): Promise<Response> {
     schedule_id: 'null'
   };
 
-  const clientIDTest = ClientIDRegularExpression.test(paramClientID);
+  const clientIDTest = ClientIDRegularExpression.test(reqClientID);
   if (clientIDTest) {
-    const thisClient = await getClient(paramClientID, env);
+    const thisClient = await getClient(reqClientID, env);
     if (typeof thisClient === 'boolean' && thisClient === false) {
       responseObject = {
         result: 'The client was not found.',
@@ -38,13 +35,13 @@ export async function schedule(request, env, ctx): Promise<Response> {
         schedule_id: 'null'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, paramTOTPToken);
+      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, reqTOTPToken);
       if (validation) {
-        await recordTOTPToken(paramClientID, paramTOTPToken, env);
-        const check = await checkTOTPToken(paramClientID, paramTOTPToken, env);
+        await recordTOTPToken(reqClientID, reqTOTPToken, env);
+        const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
         if (check) {
-          if (paramScheduledTime > now.getTime() + 60 * 1 * 1000) {
-            await addSchedule(scheduleID, paramClientID, paramStopID, paramLocationName, paramRouteID, paramRouteName, paramDirection, paramEstimateTime, paramTimeFormattingMode, paramScheduledTime, env);
+          if (reqScheduledTime > now.getTime() + 60 * 1 * 1000) {
+            await addSchedule(scheduleID, reqClientID, reqStopID, reqLocationName, reqRouteID, reqRouteName, reqDirection, reqEstimateTime, reqTimeFormattingMode, reqScheduledTime, env);
             responseObject = {
               result: 'The notification was scheduled.',
               code: 200,
