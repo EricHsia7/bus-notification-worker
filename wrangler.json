@@ -2,7 +2,7 @@
   "name": "bus-notification-worker",
   "main": "./src/index.ts",
   "compatibility_flags": ["nodejs_compat"],
-  "compatibility_date": "2024-09-23",
+  "compatibility_date": "2025-01-26",
   "workers_dev": true,
   "vars": {
     "ALLOW_REGISTRATION": "false"

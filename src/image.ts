@@ -1,7 +1,6 @@
 import { createCanvas, formatTime } from './tools';
 import { NScheduleBackend } from './database';
-
-const { createCanvas, loadImage } = require('canvas');
+import { createCanvas } from 'canvas/index.js';
 
 export async function generateImage(location_name: NScheduleBackend['LocationName'], route_name: NScheduleBackend['RouteName'], direction: NScheduleBackend['Direction'], time: number, time_formatting_mode: NScheduleBackend['TimeFormattingMode']): Promise<ArrayBuffer> {
   const width = 1280;
