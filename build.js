@@ -2,17 +2,17 @@ const esbuild = require('esbuild');
 
 esbuild
   .build({
-    entryPoints: ['./src/index.ts'], // Entry point of your Cloudflare Worker code
+    entryPoints: ['./src/index.ts'],
     bundle: true, // Bundle all dependencies into one file
     outfile: './dist/worker.js', // Output file
     platform: 'node',
-    format: 'esm', // Use ECMAScript modules
-    target: 'es2022', // Cloudflare Workers support modern JavaScript
-    minify: true, // Minify the output for better performance,
+    format: 'esm',
+    target: 'es2022',
+    minify: true,
     charset: 'utf8',
     sourcemap: false,
-    outfile: '<injected>',
-    minify: true, // disable via `--no-minify` flag
+    loader: { '.node': 'file' },
+    minify: true,
     resolveExtensions: ['.tsx', '.ts', '.jsx', '.mjs', '.js', '.json'],
     mainFields: ['worker', 'browser', 'module', 'jsnext', 'main'],
     conditions: ['worker', 'browser', 'import', 'production']
