@@ -190,7 +190,7 @@ flowchart TD
         H1 --> H2["Copy token"]
         
         I --> |"For Private Chat"| I1["Use @JsonDumpBot"]
-        I --> |"For Group Chat"| I2["Add @JsonDumpBot to group"]
+        I --> |"For Group Chat"| I2["Use -100 way or add @JsonDumpBot to group"]
     end
     
     G2 --> H
