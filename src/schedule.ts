@@ -12,6 +12,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
   const reqDirection = requestBody.direction as NScheduleBackend['Direction'];
   const reqEstimateTime = requestBody.estimate_time as NScheduleBackend['EstimateTime'];
   const reqTimeFormattingMode = requestBody.time_formatting_mode as NScheduleBackend['TimeFormattingMode'];
+  const reqTimeOffset = requestBody.time_offset as NScheduleBackend['TimeOffset'];
   const reqScheduledTime = new Date(requestBody.scheduled_time).getTime() as NScheduleBackend['ScheduledTime'];
 
   const now = new Date();
@@ -41,7 +42,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
         const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
         if (check) {
           if (reqScheduledTime > now.getTime() + 60 * 1 * 1000) {
-            await addSchedule(scheduleID, reqClientID, reqStopID, reqLocationName, reqRouteID, reqRouteName, reqDirection, reqEstimateTime, reqTimeFormattingMode, reqScheduledTime, env);
+            await addSchedule(scheduleID, reqClientID, reqStopID, reqLocationName, reqRouteID, reqRouteName, reqDirection, reqEstimateTime, reqTimeFormattingMode, reqTimeOffset, reqScheduledTime, env);
             responseObject = {
               result: 'The notification was scheduled.',
               code: 200,

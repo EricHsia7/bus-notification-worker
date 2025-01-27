@@ -32,6 +32,7 @@ const createScheduleTable = `CREATE TABLE IF NOT EXISTS "${ScheduleTableName}" (
   "EstimateTime" INTEGER NULL,
   "TimeFormattingMode" INTEGER NULL,
   "ScheduledTime" INTEGER NULL,
+  "TimeOffset" INTEGER NULL,
   "TimeStamp" INTEGER NULL
 );`;
 
@@ -49,6 +50,7 @@ export interface NScheduleBackend {
   EstimateTime: number;
   TimeFormattingMode: number;
   ScheduledTime: number;
+  TimeOffset: number;
   TimeStamp: number;
 }
 
@@ -130,7 +132,7 @@ export async function checkTOTPToken(client_id: NTOTPTokenBackend['ClientID'], t
   }
 }
 
-export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], stop_id: NScheduleBackend['StopID'], location_name: NScheduleBackend['LocationName'], route_id: NScheduleBackend['RouteID'], route_name: NScheduleBackend['RouteName'], direction: NScheduleBackend['Direction'], estimate_time: NScheduleBackend['EstimateTime'], time_formatting_mode: NScheduleBackend['TimeFormattingMode'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
+export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], stop_id: NScheduleBackend['StopID'], location_name: NScheduleBackend['LocationName'], route_id: NScheduleBackend['RouteID'], route_name: NScheduleBackend['RouteName'], direction: NScheduleBackend['Direction'], estimate_time: NScheduleBackend['EstimateTime'], time_formatting_mode: NScheduleBackend['TimeFormattingMode'], time_offset: NScheduleBackend['TimeOffset'], scheduled_time: NScheduleBackend['ScheduledTime'], env: Env) {
   const insertSchedule = `INSERT INTO
   "${ScheduleTableName}" (
     "ScheduleID",
@@ -143,12 +145,13 @@ export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], c
     "EstimateTime",
     "TimeFormattingMode",
     "ScheduledTime",
+    "TimeOffset",
     "TimeStamp"
   )
 VALUES
-  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
-  await env.DB.prepare(insertSchedule).bind(schedule_id, client_id, stop_id, location_name, route_id, route_name, direction, estimate_time, time_formatting_mode, scheduled_time, timeStamp).run();
+  await env.DB.prepare(insertSchedule).bind(schedule_id, client_id, stop_id, location_name, route_id, route_name, direction, estimate_time, time_formatting_mode, time_offset, scheduled_time, timeStamp).run();
 }
 
 export async function getSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], env: Env): Promise<NScheduleBackend | false> {
