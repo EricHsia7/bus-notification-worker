@@ -35,6 +35,7 @@ const createScheduleTable = `CREATE TABLE IF NOT EXISTS "${ScheduleTableName}" (
   "TimeOffset" INTEGER NULL,
   "TimeStamp" INTEGER NULL
 );`;
+const createScheduleTableIndex = `CREATE INDEX IF NOT EXISTS "${ScheduleTableName}Index" ON "${ScheduleTableName}" (ScheduledTime ASC);`;
 
 export const ScheduleIDRegularExpression = /^(schedule_)([A-Za-z0-9\_\-]{32,32})$/m;
 
@@ -76,6 +77,7 @@ export interface NTOTPTokenBackend {
 export async function initializeDB(env: Env) {
   await env.DB.prepare(createClientTable).run();
   await env.DB.prepare(createScheduleTable).run();
+  await env.DB.prepare(createScheduleTableIndex).run();
   await env.DB.prepare(createTOTPToken).run();
 }
 
