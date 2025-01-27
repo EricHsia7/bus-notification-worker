@@ -4,8 +4,8 @@ import { sha256 } from './tools';
 const ClientTableName = 'Client';
 const createClientTable = `CREATE TABLE IF NOT EXISTS "${ClientTableName}" (
   "Number" INTEGER PRIMARY KEY,
-  "ClientID" VARCHAR(50) NULL,
-  "Secret" VARCHAR(50) NULL,
+  "ClientID" TEXT UNIQUE,
+  "Secret" TEXT NULL,
   "TimeStamp" INTEGER NULL
 );`;
 
@@ -22,13 +22,13 @@ export interface NClientBackend {
 const ScheduleTableName = 'Schedule';
 const createScheduleTable = `CREATE TABLE IF NOT EXISTS "${ScheduleTableName}" (
   "Number" INTEGER PRIMARY KEY,
-  "ScheduleID" VARCHAR(50) NULL,
-  "ClientID" VARCHAR(50) NULL,
+  "ScheduleID" TEXT UNIQUE,
+  "ClientID" TEXT NULL,
   "StopID" INTEGER NULL,
-  "LocationName" VARCHAR(512) NULL,
+  "LocationName" TEXT NULL,
   "RouteID" INTEGER NULL,
-  "RouteName" VARCHAR(512) NULL,
-  "Direction" VARCHAR(512) NULL,
+  "RouteName" TEXT NULL,
+  "Direction" TEXT NULL,
   "EstimateTime" INTEGER NULL,
   "TimeFormattingMode" INTEGER NULL,
   "ScheduledTime" INTEGER NULL,
@@ -55,9 +55,9 @@ export interface NScheduleBackend {
 const TOTPTokenTableName = 'TOTPToken';
 const createTOTPToken = `CREATE TABLE IF NOT EXISTS "${TOTPTokenTableName}" (
   "Number" INTEGER PRIMARY KEY,
-  "Hash" CHAR(64) UNIQUE,
-  "ClientID" VARCHAR(50) NULL,
-  "Token" CHAR(8) NULL,
+  "Hash" TEXT UNIQUE,
+  "ClientID" TEXT NULL,
+  "Token" TEXT NULL,
   "Count" INTEGER DEFAULT 0,
   "TimeStamp" INTEGER NULL
 );`;
