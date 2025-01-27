@@ -1,5 +1,4 @@
 import * as OTPAuth from 'otpauth';
-import { NClientBackend } from './database';
 import { TOTPDigits, TOTPPeriod } from './index';
 
 export const sha256 = require('sha256');
@@ -10,10 +9,10 @@ export function OTPAuthSecret(size: number): string {
   return encodedSecret;
 }
 
-export function OTPAuthValidate(clientID: NClientBackend['client_id'], secret: string, token: string): boolean {
+export function OTPAuthValidate(secret: string, token: string): boolean {
   let totp = new OTPAuth.TOTP({
-    issuer: 'BusNotification',
-    label: clientID,
+    issuer: 'Bus',
+    label: 'Bus',
     algorithm: 'SHA256',
     digits: TOTPDigits,
     period: TOTPPeriod,

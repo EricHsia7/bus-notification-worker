@@ -25,7 +25,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
         method: 'cancel'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, reqTOTPToken);
+      const validation = OTPAuthValidate(thisClient.Secret, reqTOTPToken);
       if (validation) {
         await recordTOTPToken(reqClientID, reqTOTPToken, env);
         const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);

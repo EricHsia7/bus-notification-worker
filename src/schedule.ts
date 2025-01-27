@@ -35,7 +35,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
         schedule_id: 'null'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.ClientID, thisClient.Secret, reqTOTPToken);
+      const validation = OTPAuthValidate(thisClient.Secret, reqTOTPToken);
       if (validation) {
         await recordTOTPToken(reqClientID, reqTOTPToken, env);
         const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
