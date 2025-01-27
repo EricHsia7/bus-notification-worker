@@ -144,8 +144,8 @@ export async function addSchedule(schedule_id: NScheduleBackend['ScheduleID'], c
     "Direction",
     "EstimateTime",
     "TimeFormattingMode",
-    "ScheduledTime",
     "TimeOffset",
+    "ScheduledTime",
     "TimeStamp"
   )
 VALUES
