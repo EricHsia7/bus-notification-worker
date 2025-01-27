@@ -150,3 +150,59 @@ To set up this worker on your own Cloudflare account and Telegram bot, you need 
 
 1. Open wrangler.json.
 2. Change the variable **ALLOW_REGISTRATION** to `false`.
+
+## Setup Flowchart
+
+```mermaid
+flowchart TD
+    A["Start"] --> B["Fork Repository"]
+    B --> C["Create Worker"]
+    C --> D["Create Database"]
+    
+    subgraph "Cloudflare Setup"
+        C --> |"1. Go to Workers & Pages"| C1["Click Create"]
+        C1 --> C2["Click Create Worker"]
+        C2 --> C3["Name: bus-notification-worker"]
+        C3 --> C4["Deploy worker.js"]
+        
+        D --> |"1. Go to Workers & Pages"| D1["Navigate to D1 SQL Database"]
+        D1 --> D2["Click Create"]
+        D2 --> D3["Name: bus_notification_db"]
+        D3 --> D4["Copy DB ID"]
+    end
+    
+    D4 --> E["Bind DB to Worker"]
+    E --> |"1. Go to Worker Settings"| E1["Go to Bindings"]
+    E1 --> E2["Add D1 database"]
+    E2 --> E3["Variable name: DB"]
+    E3 --> E4["Select bus_notification_db"]
+    
+    E4 --> F["Import Code"]
+    F --> G["Modify wrangler.json"]
+    G --> G1["Replace DB ID"]
+    G1 --> G2["Set ALLOW_REGISTRATION to true"]
+    
+    subgraph "Telegram Setup"
+        H["Get Bot Token"]
+        I["Get Chat ID"]
+        
+        H --> |"Via @BotFather"| H1["Create new bot"]
+        H1 --> H2["Copy token"]
+        
+        I --> |"For Private Chat"| I1["Use @JsonDumpBot"]
+        I --> |"For Group Chat"| I2["Add @JsonDumpBot to group"]
+    end
+    
+    G2 --> H
+    H2 --> J["Set Environment Secrets"]
+    I1 --> J
+    I2 --> J
+    
+    J --> J1["Set TELEGRAM_BOT_TOKEN"]
+    J1 --> J2["Set TELEGRAM_CHAT_ID"]
+    J2 --> J3["Set REGISTRATION_KEY"]
+    
+    J3 --> K["Optional: Turn off Registration"]
+    K --> K1["Set ALLOW_REGISTRATION to false"]
+    K1 --> L["End"]
+```
