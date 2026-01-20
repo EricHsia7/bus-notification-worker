@@ -3,7 +3,7 @@ import { Env, getHeaders, NResponseRegister, SecretSize } from './index';
 import { generateIdentifier, generateSecret, sha256 } from './tools';
 
 export async function register(request, requestBody, env: Env, ctx): Promise<Response> {
-  const referer = request.headers.get('referer');
+  const origin = request.headers.get('origin');
 
   const reqHash = requestBody.hash;
 
@@ -58,6 +58,6 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: getHeaders(referer)
+    headers: getHeaders(origin)
   });
 }

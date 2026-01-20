@@ -48,11 +48,11 @@ export interface NResponseReschedule {
 
 export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate | NResponseReschedule;
 
-export function getHeaders(referer: any): object {
+export function getHeaders(origin: any): object {
   return {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': typeof referer === 'string' ? referer : '*',
+    'Access-Control-Allow-Origin': typeof origin === 'string' ? origin : '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Credentials': false,
     'Access-Control-Allow-Headers': '*',
@@ -73,7 +73,7 @@ export default {
     const param_method = url_params.get('method');
 
     const contentType = request.headers.get('Content-Type');
-    const referer = request.headers.get('referer');
+    const origin = request.headers.get('origin');
     if (String(contentType).includes('application/json')) {
       const requestBody = await request.json();
       switch (param_method) {
@@ -106,7 +106,7 @@ export default {
             }),
             {
               status: 200,
-              headers: getHeaders(referer)
+              headers: getHeaders(origin)
             }
           );
           break;
@@ -120,7 +120,7 @@ export default {
         }),
         {
           status: 200,
-          headers: getHeaders(referer)
+          headers: getHeaders(origin)
         }
       );
     }

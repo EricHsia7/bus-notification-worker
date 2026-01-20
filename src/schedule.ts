@@ -3,7 +3,7 @@ import { getHeaders, NResponseSchedule } from './index';
 import { generateIdentifier, validateToken } from './tools';
 
 export async function schedule(request, requestBody, env, ctx): Promise<Response> {
-  const referer = request.headers.get('referer');
+  const origin = request.headers.get('origin');
 
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
   const reqToken = requestBody.token as NTokenBackend['Token'];
@@ -102,6 +102,6 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: getHeaders(referer)
+    headers: getHeaders(origin)
   });
 }
