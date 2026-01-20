@@ -1,4 +1,4 @@
-import { discardExpiredSchedules, discardExpiredTOTPToken, listSchedules } from './database';
+import { discardExpiredSchedules, discardExpiredToken, listSchedules } from './database';
 import { sendTextMessageViaTelegram } from './telegram';
 import { formatTime } from './tools';
 
@@ -13,5 +13,5 @@ export async function send(event, env, ctx) {
     await sendTextMessageViaTelegram(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, message, url.toString());
   }
   await discardExpiredSchedules(now, env);
-  await discardExpiredTOTPToken(now, env);
+  await discardExpiredToken(now, env);
 }

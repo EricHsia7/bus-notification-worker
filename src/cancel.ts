@@ -1,6 +1,6 @@
+import { checkToken, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordToken, ScheduleIDRegularExpression } from './database';
 import { headers, NResponseCancel } from './index';
 import { validateToken } from './tools';
-import { checkToken, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordTOTPToken, ScheduleIDRegularExpression } from './database';
 
 export async function cancel(request, requestBody, env, ctx): Promise<Response> {
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
@@ -27,7 +27,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     } else {
       const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID }, now.getTime());
       if (validation) {
-        await recordTOTPToken(reqClientID, reqToken, env);
+        await recordToken(reqClientID, reqToken, env);
         const check = await checkToken(reqClientID, reqToken, env);
         if (check) {
           const scheduleIDTest = ScheduleIDRegularExpression.test(reqScheduleID);

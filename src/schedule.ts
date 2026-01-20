@@ -1,6 +1,6 @@
+import { addSchedule, checkToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTokenBackend, recordToken } from './database';
 import { headers, NResponseSchedule } from './index';
 import { generateIdentifier, validateToken } from './tools';
-import { addSchedule, checkToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTokenBackend, recordTOTPToken } from './database';
 
 export async function schedule(request, requestBody, env, ctx): Promise<Response> {
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
@@ -48,7 +48,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
         scheduled_time: reqScheduledTime
       }, now.getTime());
       if (validation) {
-        await recordTOTPToken(reqClientID, reqToken, env);
+        await recordToken(reqClientID, reqToken, env);
         const check = await checkToken(reqClientID, reqToken, env);
         if (check) {
           if (reqScheduledTime > now.getTime() + 60 * 1 * 1000) {

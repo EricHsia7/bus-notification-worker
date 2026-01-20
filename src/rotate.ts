@@ -1,6 +1,6 @@
+import { checkToken, ClientIDRegularExpression, getClient, NClientBackend, NTokenBackend, recordToken, setClientSecret } from './database';
 import { headers, NResponseRotate, SecretSize } from './index';
 import { generateSecret, validateToken } from './tools';
-import { checkToken, ClientIDRegularExpression, getClient, NClientBackend, NTokenBackend, recordTOTPToken, setClientSecret } from './database';
 
 export async function rotate(request, requestBody, env, ctx): Promise<Response> {
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
@@ -8,7 +8,7 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
 
   const now = new Date();
 
-  const TOTPSecret = generateSecret(SecretSize);
+  const secret = generateSecret(SecretSize);
 
   let responseObject: NResponseRotate = {
     result: 'There was an unknown error.',
@@ -30,15 +30,15 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
     } else {
       const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, {}, now.getTime());
       if (validation) {
-        await recordTOTPToken(reqClientID, reqToken, env);
+        await recordToken(reqClientID, reqToken, env);
         const check = await checkToken(reqClientID, reqToken, env);
         if (check) {
-          await setClientSecret(thisClient.ClientID, TOTPSecret, env);
+          await setClientSecret(thisClient.ClientID, secret, env);
           responseObject = {
             result: 'The secret was rotated.',
             code: 200,
             method: 'rotate',
-            secret: TOTPSecret
+            secret: secret
           };
         } else {
           responseObject = {
