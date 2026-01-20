@@ -68,7 +68,7 @@ export default {
     const url_params = url.searchParams;
     const param_method = url_params.get('method');
 
-    const contentType = request.headers.get('content-type');
+    const contentType = request.headers.get('Content-Type');
     console.log(contentType);
     if (String(contentType).includes('application/json')) {
       const requestBody = await request.json();
