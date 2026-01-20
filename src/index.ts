@@ -55,7 +55,8 @@ export function getHeaders(referer: any): object {
     'Access-Control-Allow-Origin': typeof referer === 'string' ? referer : '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Credentials': false,
-    'Access-Control-Allow-Headers': '*'
+    'Access-Control-Allow-Headers': '*',
+    'Vary': 'Origin'
   };
 }
 
