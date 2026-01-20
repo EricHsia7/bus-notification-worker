@@ -22,7 +22,6 @@
     "@cloudflare/workers-types": "^4.20250124.3"
   },
   "dependencies": {
-    "otpauth": "^9.3.6",
     "sha256": "^0.2.0"
   }
 }
