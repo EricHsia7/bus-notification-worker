@@ -1,7 +1,7 @@
 import { NClientBackend } from './database';
 import { TokenPeriod } from './index';
 
-export const sha256 = require('sha256');
+export const { sha512 } = require('js-sha512');
 
 export function generateSecret(size: number): string {
   const CHARSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -25,9 +25,9 @@ export function generateSecret(size: number): string {
 export function validateToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], token: string, payload: object, now: number): boolean {
   const window = TokenPeriod * 1000;
   const i = (now - (now % window)) / window;
-  const previousToken = sha256(`${client_id} ${secret} ${(i - 1).toString(16)} ${JSON.stringify(payload)}`);
-  const currentToken = sha256(`${client_id} ${secret} ${i.toString(16)} ${JSON.stringify(payload)}`);
-  const nextToken = sha256(`${client_id} ${secret} ${(i + 1).toString(16)} ${JSON.stringify(payload)}`);
+  const previousToken = sha512(sha512(`${client_id} ${secret} ${(i - 1).toString(16)} ${sha512(JSON.stringify(payload))}`));
+  const currentToken = sha512(sha512(`${client_id} ${secret} ${i.toString(16)} ${sha512(JSON.stringify(payload))}`));
+  const nextToken = sha512(sha512(`${client_id} ${secret} ${(i + 1).toString(16)} ${sha512(JSON.stringify(payload))}`));
   if (currentToken === token || previousToken === token || nextToken === token) {
     return true;
   } else {

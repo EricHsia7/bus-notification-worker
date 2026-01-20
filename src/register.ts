@@ -1,6 +1,6 @@
 import { addClient, initializeDB } from './database';
 import { Env, getHeaders, NResponseRegister, SecretSize } from './index';
-import { generateIdentifier, generateSecret, sha256 } from './tools';
+import { generateIdentifier, generateSecret, sha512 } from './tools';
 
 export async function register(request, requestBody, env: Env, ctx): Promise<Response> {
   const origin = request.headers.get('origin');
@@ -14,9 +14,9 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
   currentDate.setMilliseconds(0);
   currentDate.setSeconds(0);
 
-  const envHash_previous = sha256(`${env.REGISTRATION_KEY}${currentDate.getTime() - 60 * 1000}`);
-  const envHash_current = sha256(`${env.REGISTRATION_KEY}${currentDate.getTime()}`);
-  const envHash_next = sha256(`${env.REGISTRATION_KEY}${currentDate.getTime() + 60 * 1000}`);
+  const envHash_previous = sha512(`${sha512(env.REGISTRATION_KEY)}${currentDate.getTime() - 60 * 1000}`);
+  const envHash_current = sha512(`${sha512(env.REGISTRATION_KEY)}${currentDate.getTime()}`);
+  const envHash_next = sha512(`${sha512(env.REGISTRATION_KEY)}${currentDate.getTime() + 60 * 1000}`);
 
   let responseObject: NResponseRegister = {
     result: 'There was an unknown error.',
