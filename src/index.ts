@@ -49,13 +49,13 @@ export interface NResponseReschedule {
 export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate | NResponseReschedule;
 
 export function getHeaders(referer: any): object {
-  return (headers = {
+  return {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': typeof referer === 'string' ? referer : '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': '*'
-  });
+  };
 }
 
 export const SecretSize = 64;
