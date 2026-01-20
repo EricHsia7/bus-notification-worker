@@ -1,10 +1,10 @@
 import { headers, NResponseReschedule } from './index';
-import { OTPAuthValidate } from './tools';
-import { checkTOTPToken, ClientIDRegularExpression, getClient, getSchedule, modifySchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken, ScheduleIDRegularExpression } from './database';
+import { validateToken } from './tools';
+import { checkToken, ClientIDRegularExpression, getClient, getSchedule, modifySchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordTOTPToken, ScheduleIDRegularExpression } from './database';
 
 export async function reschedule(request, requestBody, env, ctx): Promise<Response> {
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
-  const reqTOTPToken = requestBody.totp_token as NTOTPTokenBackend['Token'];
+  const reqToken = requestBody.token as NTokenBackend['Token'];
   const reqScheduleID = requestBody.schedule_id as NScheduleBackend['ScheduleID'];
   const reqEstimateTime = requestBody.estimate_time as NScheduleBackend['EstimateTime'];
   const reqScheduledTime = new Date(requestBody.scheduled_time).getTime() as NScheduleBackend['ScheduledTime'];
@@ -27,10 +27,10 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
         method: 'reschedule'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.Secret, reqTOTPToken);
+      const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID, estimate_time: reqEstimateTime, scheduled_time: reqScheduledTime });
       if (validation) {
-        await recordTOTPToken(reqClientID, reqTOTPToken, env);
-        const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
+        await recordTOTPToken(reqClientID, reqToken, env);
+        const check = await checkToken(reqClientID, reqToken, env);
         if (check) {
           const scheduleIDTest = ScheduleIDRegularExpression.test(reqScheduleID);
           if (scheduleIDTest) {

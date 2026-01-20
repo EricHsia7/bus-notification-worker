@@ -1,12 +1,12 @@
 import { headers, NResponseRotate, TOTPSecretSize } from './index';
-import { OTPAuthSecret, OTPAuthValidate } from './tools';
-import { checkTOTPToken, ClientIDRegularExpression, getClient, NClientBackend, NTOTPTokenBackend, recordTOTPToken, setClientSecret } from './database';
+import { generateSecret, validateToken } from './tools';
+import { checkToken, ClientIDRegularExpression, getClient, NClientBackend, NTokenBackend, recordTOTPToken, setClientSecret } from './database';
 
 export async function rotate(request, requestBody, env, ctx): Promise<Response> {
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
-  const reqTOTPToken = requestBody.totp_token as NTOTPTokenBackend['Token'];
+  const reqToken = requestBody.token as NTokenBackend['Token'];
 
-  const TOTPSecret = OTPAuthSecret(TOTPSecretSize);
+  const TOTPSecret = generateSecret(TOTPSecretSize);
 
   let responseObject: NResponseRotate = {
     result: 'There was an unknown error.',
@@ -26,10 +26,10 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
         secret: 'null'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.Secret, reqTOTPToken);
+      const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, {});
       if (validation) {
-        await recordTOTPToken(reqClientID, reqTOTPToken, env);
-        const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
+        await recordTOTPToken(reqClientID, reqToken, env);
+        const check = await checkToken(reqClientID, reqToken, env);
         if (check) {
           await setClientSecret(thisClient.ClientID, TOTPSecret, env);
           responseObject = {
