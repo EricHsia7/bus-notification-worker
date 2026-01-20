@@ -1,8 +1,10 @@
 import { addSchedule, checkToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTokenBackend, recordToken } from './database';
-import { headers, NResponseSchedule } from './index';
+import { getHeaders, headers, NResponseSchedule } from './index';
 import { generateIdentifier, validateToken } from './tools';
 
 export async function schedule(request, requestBody, env, ctx): Promise<Response> {
+  const referer = request.headers.get('referer');
+
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
   const reqToken = requestBody.token as NTokenBackend['Token'];
   const reqStopID = requestBody.stop_id as NScheduleBackend['StopID'];
@@ -100,6 +102,6 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getHeaders(referer)
   });
 }

@@ -48,7 +48,7 @@ export interface NResponseReschedule {
 
 export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate | NResponseReschedule;
 
-function getHeaders(referer: any): object {
+export function getHeaders(referer: any): object {
   return (headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',

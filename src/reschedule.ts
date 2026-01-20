@@ -1,8 +1,10 @@
 import { checkToken, ClientIDRegularExpression, getClient, getSchedule, modifySchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordToken, ScheduleIDRegularExpression } from './database';
-import { headers, NResponseReschedule } from './index';
+import { getHeaders, NResponseReschedule } from './index';
 import { validateToken } from './tools';
 
 export async function reschedule(request, requestBody, env, ctx): Promise<Response> {
+  const referer = request.headers.get('referer');
+
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
   const reqToken = requestBody.token as NTokenBackend['Token'];
   const reqScheduleID = requestBody.schedule_id as NScheduleBackend['ScheduleID'];
@@ -99,6 +101,6 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getHeaders(referer)
   });
 }

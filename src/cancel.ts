@@ -87,6 +87,6 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getH
   });
 }

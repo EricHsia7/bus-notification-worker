@@ -1,8 +1,10 @@
 import { addClient, initializeDB } from './database';
-import { Env, headers, NResponseRegister, SecretSize } from './index';
+import { Env, getHeaders, NResponseRegister, SecretSize } from './index';
 import { generateIdentifier, generateSecret, sha256 } from './tools';
 
 export async function register(request, requestBody, env: Env, ctx): Promise<Response> {
+  const referer = request.headers.get('referer');
+
   const reqHash = requestBody.hash;
 
   const clientID = generateIdentifier('client');
@@ -53,8 +55,9 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
       secret: 'null'
     };
   }
+
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getHeaders(referer)
   });
 }

@@ -1,8 +1,10 @@
 import { checkToken, ClientIDRegularExpression, getClient, NClientBackend, NTokenBackend, recordToken, setClientSecret } from './database';
-import { headers, NResponseRotate, SecretSize } from './index';
+import { getHeaders, NResponseRotate, SecretSize } from './index';
 import { generateSecret, validateToken } from './tools';
 
 export async function rotate(request, requestBody, env, ctx): Promise<Response> {
+  const referer = request.headers.get('referer');
+
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
   const reqToken = requestBody.token as NTokenBackend['Token'];
 
@@ -68,6 +70,6 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getHeaders(referer)
   });
 }
