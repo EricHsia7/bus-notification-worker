@@ -36,17 +36,23 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
         schedule_id: 'null'
       };
     } else {
-      const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, {
-        stop_id: reqStopID,
-        location_name: reqLocationName,
-        route_id: reqRouteID,
-        route_name: reqRouteName,
-        direction: reqDirection,
-        estimate_time: reqEstimateTime,
-        time_formatting_mode: reqTimeFormattingMode,
-        time_offset: reqTimeOffset,
-        scheduled_time: reqScheduledTime
-      }, now.getTime());
+      const validation = validateToken(
+        thisClient.ClientID,
+        thisClient.Secret,
+        reqToken,
+        {
+          stop_id: reqStopID,
+          location_name: reqLocationName,
+          route_id: reqRouteID,
+          route_name: reqRouteName,
+          direction: reqDirection,
+          estimate_time: reqEstimateTime,
+          time_formatting_mode: reqTimeFormattingMode,
+          time_offset: reqTimeOffset,
+          scheduled_time: requestBody.scheduled_time
+        },
+        now.getTime()
+      );
       if (validation) {
         await recordToken(reqClientID, reqToken, env);
         const check = await checkToken(reqClientID, reqToken, env);

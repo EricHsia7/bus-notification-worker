@@ -34,7 +34,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
         {
           schedule_id: reqScheduleID,
           estimate_time: reqEstimateTime,
-          scheduled_time: reqScheduledTime
+          scheduled_time: requestBody.scheduled_time
         },
         now.getTime()
       );
