@@ -48,13 +48,15 @@ export interface NResponseReschedule {
 
 export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate | NResponseReschedule;
 
-export const headers = {
-  'Accept': 'application/json',
-  'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': '*'
-};
+function getHeaders(referer: any): object {
+  return (headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': typeof referer === 'string' ? referer : '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': '*'
+  });
+}
 
 export const SecretSize = 64;
 export const TokenPeriod = 10;
@@ -69,7 +71,7 @@ export default {
     const param_method = url_params.get('method');
 
     const contentType = request.headers.get('Content-Type');
-    console.log(contentType);
+    const referer = request.headers.get('referer');
     if (String(contentType).includes('application/json')) {
       const requestBody = await request.json();
       switch (param_method) {
@@ -102,7 +104,7 @@ export default {
             }),
             {
               status: 200,
-              headers: headers
+              headers: getHeaders(referer)
             }
           );
           break;
@@ -110,13 +112,13 @@ export default {
     } else {
       return new Response(
         JSON.stringify({
-          result: `The method '${param_method}' is unsupported.`,
+          result: `The Content-Type '${contentType}' is unsupported.`,
           code: 400,
           method: param_method
         }),
         {
           status: 200,
-          headers: headers
+          headers: getHeaders(referer)
         }
       );
     }
