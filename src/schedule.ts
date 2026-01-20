@@ -1,5 +1,5 @@
 import { addSchedule, checkToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTokenBackend, recordToken } from './database';
-import { getHeaders, headers, NResponseSchedule } from './index';
+import { getHeaders, NResponseSchedule } from './index';
 import { generateIdentifier, validateToken } from './tools';
 
 export async function schedule(request, requestBody, env, ctx): Promise<Response> {

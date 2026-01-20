@@ -1,8 +1,10 @@
 import { checkToken, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordToken, ScheduleIDRegularExpression } from './database';
-import { headers, NResponseCancel } from './index';
+import { getHeaders, NResponseCancel } from './index';
 import { validateToken } from './tools';
 
 export async function cancel(request, requestBody, env, ctx): Promise<Response> {
+  const referer = request.headers.get('referer');
+
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
   const reqToken = requestBody.token as NTokenBackend['Token'];
   const reqScheduleID = requestBody.schedule_id as NScheduleBackend['ScheduleID'];
@@ -87,6 +89,6 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: getH
+    headers: getHeaders(referer)
   });
 }
