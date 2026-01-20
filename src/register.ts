@@ -1,12 +1,14 @@
-import { headers, NResponseRegister, TOTPSecretSize, Env } from './index';
 import { addClient, initializeDB } from './database';
-import { generateIdentifier, OTPAuthSecret, sha256 } from './tools';
+import { Env, getHeaders, NResponseRegister, SecretSize } from './index';
+import { generateIdentifier, generateSecret, sha256 } from './tools';
 
 export async function register(request, requestBody, env: Env, ctx): Promise<Response> {
+  const origin = request.headers.get('origin');
+
   const reqHash = requestBody.hash;
 
   const clientID = generateIdentifier('client');
-  const TOTPSecret = OTPAuthSecret(TOTPSecretSize);
+  const secret = generateSecret(SecretSize);
 
   const currentDate = new Date();
   currentDate.setMilliseconds(0);
@@ -27,13 +29,13 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
   if (String(env.ALLOW_REGISTRATION).toLowerCase() === 'true') {
     if (reqHash === envHash_previous || reqHash === envHash_current || reqHash === envHash_next) {
       await initializeDB(env);
-      await addClient(clientID, TOTPSecret, env);
+      await addClient(clientID, secret, env);
       responseObject = {
         result: 'Client was registered.',
         code: 200,
         method: 'register',
         client_id: clientID,
-        secret: TOTPSecret
+        secret: secret
       };
     } else {
       responseObject = {
@@ -53,8 +55,9 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
       secret: 'null'
     };
   }
+
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getHeaders(origin)
   });
 }

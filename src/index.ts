@@ -48,18 +48,21 @@ export interface NResponseReschedule {
 
 export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate | NResponseReschedule;
 
-export const headers = {
-  'Accept': 'application/json',
-  'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': '*'
-};
+export function getHeaders(origin: any): object {
+  return {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': typeof origin === 'string' ? origin : '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Credentials': false,
+    'Access-Control-Allow-Headers': '*',
+    'Vary': 'Origin'
+  };
+}
 
-export const TOTPSecretSize = 32;
-export const TOTPDigits = 8;
-export const TOTPPeriod = 10;
-export const TOTPUsageLimit = 5;
+export const SecretSize = 64;
+export const TokenPeriod = 10;
+export const TokenUsageLimit = 5;
 
 // Export a default object containing event handlers
 export default {
@@ -69,8 +72,9 @@ export default {
     const url_params = url.searchParams;
     const param_method = url_params.get('method');
 
-    const contentType = request.headers.get('content-type');
-    if (contentType.includes('application/json')) {
+    const contentType = request.headers.get('Content-Type');
+    const origin = request.headers.get('origin');
+    if (String(contentType).includes('application/json')) {
       const requestBody = await request.json();
       switch (param_method) {
         case 'register':
@@ -102,7 +106,7 @@ export default {
             }),
             {
               status: 200,
-              headers: headers
+              headers: getHeaders(origin)
             }
           );
           break;
@@ -110,13 +114,13 @@ export default {
     } else {
       return new Response(
         JSON.stringify({
-          result: `The method '${param_method}' is unsupported.`,
+          result: `The Content-Type '${contentType}' is unsupported.`,
           code: 400,
           method: param_method
         }),
         {
           status: 200,
-          headers: headers
+          headers: getHeaders(origin)
         }
       );
     }

@@ -1,31 +1,37 @@
-import * as OTPAuth from 'otpauth';
-import { TOTPDigits, TOTPPeriod } from './index';
+import { NClientBackend } from './database';
+import { TokenPeriod } from './index';
 
 export const sha256 = require('sha256');
 
-export function OTPAuthSecret(size: number): string {
-  const secret = new OTPAuth.Secret({ size });
-  const encodedSecret = secret.base32;
-  return encodedSecret;
+export function generateSecret(size: number): string {
+  const CHARSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const BASE = 62n;
+
+  let num = 0n;
+  let result = '';
+  for (let i = size - 1; i >= 0; i--) {
+    // Shift the current result left by 8 bits and add the new byte
+    const byte = Math.floor(Math.random() * 255);
+    num = (num << 8n) + BigInt(byte);
+  }
+  while (num > 0n) {
+    const remainder = num % BASE;
+    result = CHARSET[Number(remainder)] + result;
+    num = num / BASE;
+  }
+  return result;
 }
 
-export function OTPAuthValidate(secret: string, token: string): boolean {
-  let totp = new OTPAuth.TOTP({
-    issuer: 'Bus',
-    label: 'Bus',
-    algorithm: 'SHA256',
-    digits: TOTPDigits,
-    period: TOTPPeriod,
-    secret: secret
-  });
-  let delta = totp.validate({
-    token,
-    window: 1
-  });
-  if (delta === null) {
-    return false;
-  } else {
+export function validateToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], token: string, payload: object, now: number): boolean {
+  const window = TokenPeriod * 1000;
+  const i = (now - (now % window)) / window;
+  const previousToken = sha256(`${client_id} ${secret} ${(i - 1).toString(16)} ${JSON.stringify(payload)}`);
+  const currentToken = sha256(`${client_id} ${secret} ${i.toString(16)} ${JSON.stringify(payload)}`);
+  const nextToken = sha256(`${client_id} ${secret} ${(i + 1).toString(16)} ${JSON.stringify(payload)}`);
+  if (currentToken === token || previousToken === token || nextToken === token) {
     return true;
+  } else {
+    return false;
   }
 }
 

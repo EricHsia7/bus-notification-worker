@@ -1,4 +1,4 @@
-import { TOTPPeriod, Env, TOTPUsageLimit } from './index';
+import { Env, TokenPeriod, TokenUsageLimit } from './index';
 import { sha256 } from './tools';
 
 const ClientTableName = 'Client';
@@ -55,8 +55,8 @@ export interface NScheduleBackend {
   TimeStamp: number;
 }
 
-const TOTPTokenTableName = 'TOTPToken';
-const createTOTPToken = `CREATE TABLE IF NOT EXISTS "${TOTPTokenTableName}" (
+const TokenTableName = 'Token';
+const createToken = `CREATE TABLE IF NOT EXISTS "${TokenTableName}" (
   "Number" INTEGER PRIMARY KEY,
   "Hash" TEXT UNIQUE,
   "ClientID" TEXT NULL,
@@ -65,7 +65,7 @@ const createTOTPToken = `CREATE TABLE IF NOT EXISTS "${TOTPTokenTableName}" (
   "TimeStamp" INTEGER NULL
 );`;
 
-export interface NTOTPTokenBackend {
+export interface NTokenBackend {
   Number: number;
   Hash: string;
   ClientID: NClientBackend['ClientID'];
@@ -78,7 +78,7 @@ export async function initializeDB(env: Env) {
   await env.DB.prepare(createClientTable).run();
   await env.DB.prepare(createScheduleTable).run();
   await env.DB.prepare(createScheduleTableIndex).run();
-  await env.DB.prepare(createTOTPToken).run();
+  await env.DB.prepare(createToken).run();
 }
 
 export async function addClient(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], env: Env) {
@@ -107,26 +107,26 @@ export async function setClientSecret(client_id: NClientBackend['ClientID'], new
   await env.DB.prepare(updateSecret).bind(newSecret, timeStamp, client_id).run();
 }
 
-export async function recordTOTPToken(client_id: NClientBackend['ClientID'], token: NTOTPTokenBackend['Token'], env: Env) {
-  const insertTOTPToken = `INSERT OR IGNORE INTO "${TOTPTokenTableName}" ("Hash", "ClientID", "Token", "TimeStamp") VALUES (?, ?, ?, ?);`;
-  const updateTOTPToken = `UPDATE "${TOTPTokenTableName}" SET "Count" = "Count" + 1 WHERE Hash = ?;`;
+export async function recordToken(client_id: NClientBackend['ClientID'], token: NTokenBackend['Token'], env: Env) {
+  const insertToken = `INSERT OR IGNORE INTO "${TokenTableName}" ("Hash", "ClientID", "Token", "TimeStamp") VALUES (?, ?, ?, ?);`;
+  const updateToken = `UPDATE "${TokenTableName}" SET "Count" = "Count" + 1 WHERE Hash = ?;`;
   const timeStamp = new Date().getTime();
   const hash = sha256(`${token}${client_id}${token}`);
-  await env.DB.prepare(insertTOTPToken).bind(hash, client_id, token, timeStamp).run();
-  await env.DB.prepare(updateTOTPToken).bind(hash).run();
+  await env.DB.prepare(insertToken).bind(hash, client_id, token, timeStamp).run();
+  await env.DB.prepare(updateToken).bind(hash).run();
 }
 
-export async function discardExpiredTOTPToken(now: number, env: Env) {
-  const deleteTOTPToken = `DELETE FROM "${TOTPTokenTableName}" WHERE TimeStamp < ?`;
-  const deadline = now - TOTPPeriod * 3 * 1000;
-  await env.DB.prepare(deleteTOTPToken).bind(deadline).run();
+export async function discardExpiredToken(now: number, env: Env) {
+  const deleteToken = `DELETE FROM "${TokenTableName}" WHERE TimeStamp < ?`;
+  const deadline = now - TokenPeriod * 3 * 1000;
+  await env.DB.prepare(deleteToken).bind(deadline).run();
 }
 
-export async function checkTOTPToken(client_id: NTOTPTokenBackend['ClientID'], token: NTOTPTokenBackend['Token'], env: Env): Promise<boolean> {
-  const selectTOTPToken = `SELECT "Count" FROM "${TOTPTokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count >= ?`;
-  const deadline = new Date().getTime() - TOTPPeriod * 3 * 1000;
-  const hash = sha256(`${token}${client_id}${token}`);
-  const { results } = (await env.DB.prepare(selectTOTPToken).bind(deadline, hash, TOTPUsageLimit).all()) as Array<NTOTPTokenBackend>;
+export async function checkToken(client_id: NTokenBackend['ClientID'], token: NTokenBackend['Token'], env: Env): Promise<boolean> {
+  const selectToken = `SELECT "Count" FROM "${TokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count >= ?`;
+  const deadline = new Date().getTime() - TokenPeriod * 3 * 1000;
+  const hash = sha256(`${client_id}${token}`);
+  const { results } = (await env.DB.prepare(selectToken).bind(deadline, hash, TokenUsageLimit).all()) as Array<NTokenBackend>;
   if (results.length > 0) {
     return false;
   } else {

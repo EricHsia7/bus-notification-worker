@@ -1,10 +1,12 @@
-import { headers, NResponseSchedule } from './index';
-import { generateIdentifier, OTPAuthValidate } from './tools';
-import { addSchedule, checkTOTPToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken } from './database';
+import { addSchedule, checkToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTokenBackend, recordToken } from './database';
+import { getHeaders, NResponseSchedule } from './index';
+import { generateIdentifier, validateToken } from './tools';
 
 export async function schedule(request, requestBody, env, ctx): Promise<Response> {
+  const origin = request.headers.get('origin');
+
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
-  const reqTOTPToken = requestBody.totp_token as NTOTPTokenBackend['Token'];
+  const reqToken = requestBody.token as NTokenBackend['Token'];
   const reqStopID = requestBody.stop_id as NScheduleBackend['StopID'];
   const reqLocationName = requestBody.location_name as NScheduleBackend['LocationName'];
   const reqRouteID = requestBody.route_id as NScheduleBackend['RouteID'];
@@ -36,10 +38,26 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
         schedule_id: 'null'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.Secret, reqTOTPToken);
+      const validation = validateToken(
+        thisClient.ClientID,
+        thisClient.Secret,
+        reqToken,
+        {
+          stop_id: reqStopID,
+          location_name: reqLocationName,
+          route_id: reqRouteID,
+          route_name: reqRouteName,
+          direction: reqDirection,
+          estimate_time: reqEstimateTime,
+          time_formatting_mode: reqTimeFormattingMode,
+          time_offset: reqTimeOffset,
+          scheduled_time: requestBody.scheduled_time
+        },
+        now.getTime()
+      );
       if (validation) {
-        await recordTOTPToken(reqClientID, reqTOTPToken, env);
-        const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
+        await recordToken(reqClientID, reqToken, env);
+        const check = await checkToken(reqClientID, reqToken, env);
         if (check) {
           if (reqScheduledTime > now.getTime() + 60 * 1 * 1000) {
             await addSchedule(scheduleID, reqClientID, reqStopID, reqLocationName, reqRouteID, reqRouteName, reqDirection, reqEstimateTime, reqTimeFormattingMode, reqTimeOffset, reqScheduledTime, env);
@@ -84,6 +102,6 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getHeaders(origin)
   });
 }

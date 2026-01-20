@@ -1,10 +1,12 @@
-import { headers, NResponseCancel } from './index';
-import { OTPAuthValidate } from './tools';
-import { checkTOTPToken, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTOTPTokenBackend, recordTOTPToken, ScheduleIDRegularExpression } from './database';
+import { checkToken, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordToken, ScheduleIDRegularExpression } from './database';
+import { getHeaders, NResponseCancel } from './index';
+import { validateToken } from './tools';
 
 export async function cancel(request, requestBody, env, ctx): Promise<Response> {
+  const origin = request.headers.get('origin');
+
   const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
-  const reqTOTPToken = requestBody.totp_token as NTOTPTokenBackend['Token'];
+  const reqToken = requestBody.token as NTokenBackend['Token'];
   const reqScheduleID = requestBody.schedule_id as NScheduleBackend['ScheduleID'];
 
   const now = new Date();
@@ -25,10 +27,10 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
         method: 'cancel'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.Secret, reqTOTPToken);
+      const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID }, now.getTime());
       if (validation) {
-        await recordTOTPToken(reqClientID, reqTOTPToken, env);
-        const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
+        await recordToken(reqClientID, reqToken, env);
+        const check = await checkToken(reqClientID, reqToken, env);
         if (check) {
           const scheduleIDTest = ScheduleIDRegularExpression.test(reqScheduleID);
           if (scheduleIDTest) {
@@ -87,6 +89,6 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getHeaders(origin)
   });
 }

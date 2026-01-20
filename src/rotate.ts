@@ -1,12 +1,16 @@
-import { headers, NResponseRotate, TOTPSecretSize } from './index';
-import { OTPAuthSecret, OTPAuthValidate } from './tools';
-import { checkTOTPToken, ClientIDRegularExpression, getClient, NClientBackend, NTOTPTokenBackend, recordTOTPToken, setClientSecret } from './database';
+import { checkToken, ClientIDRegularExpression, getClient, NClientBackend, NTokenBackend, recordToken, setClientSecret } from './database';
+import { getHeaders, NResponseRotate, SecretSize } from './index';
+import { generateSecret, validateToken } from './tools';
 
 export async function rotate(request, requestBody, env, ctx): Promise<Response> {
-  const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
-  const reqTOTPToken = requestBody.totp_token as NTOTPTokenBackend['Token'];
+  const origin = request.headers.get('origin');
 
-  const TOTPSecret = OTPAuthSecret(TOTPSecretSize);
+  const reqClientID = requestBody.client_id as NClientBackend['ClientID'];
+  const reqToken = requestBody.token as NTokenBackend['Token'];
+
+  const now = new Date();
+
+  const secret = generateSecret(SecretSize);
 
   let responseObject: NResponseRotate = {
     result: 'There was an unknown error.',
@@ -26,17 +30,17 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
         secret: 'null'
       };
     } else {
-      const validation = OTPAuthValidate(thisClient.Secret, reqTOTPToken);
+      const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, {}, now.getTime());
       if (validation) {
-        await recordTOTPToken(reqClientID, reqTOTPToken, env);
-        const check = await checkTOTPToken(reqClientID, reqTOTPToken, env);
+        await recordToken(reqClientID, reqToken, env);
+        const check = await checkToken(reqClientID, reqToken, env);
         if (check) {
-          await setClientSecret(thisClient.ClientID, TOTPSecret, env);
+          await setClientSecret(thisClient.ClientID, secret, env);
           responseObject = {
             result: 'The secret was rotated.',
             code: 200,
             method: 'rotate',
-            secret: TOTPSecret
+            secret: secret
           };
         } else {
           responseObject = {
@@ -66,6 +70,6 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
 
   return new Response(JSON.stringify(responseObject), {
     status: 200,
-    headers: headers
+    headers: getHeaders(origin)
   });
 }
