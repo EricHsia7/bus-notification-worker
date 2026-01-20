@@ -46,7 +46,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
         time_formatting_mode: reqTimeFormattingMode,
         time_offset: reqTimeOffset,
         scheduled_time: reqScheduledTime
-      });
+      }, now.getTime());
       if (validation) {
         await recordTOTPToken(reqClientID, reqToken, env);
         const check = await checkToken(reqClientID, reqToken, env);

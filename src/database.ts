@@ -1,4 +1,4 @@
-import { TOTPPeriod, Env, TOTPUsageLimit } from './index';
+import { TokenPeriod, Env, TokenUsageLimit } from './index';
 import { sha256 } from './tools';
 
 const ClientTableName = 'Client';
@@ -118,15 +118,15 @@ export async function recordTOTPToken(client_id: NClientBackend['ClientID'], tok
 
 export async function discardExpiredTOTPToken(now: number, env: Env) {
   const deleteTOTPToken = `DELETE FROM "${TOTPTokenTableName}" WHERE TimeStamp < ?`;
-  const deadline = now - TOTPPeriod * 3 * 1000;
+  const deadline = now - TokenPeriod * 3 * 1000;
   await env.DB.prepare(deleteTOTPToken).bind(deadline).run();
 }
 
 export async function checkToken(client_id: NTokenBackend['ClientID'], token: NTokenBackend['Token'], env: Env): Promise<boolean> {
   const selectTOTPToken = `SELECT "Count" FROM "${TOTPTokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count >= ?`;
-  const deadline = new Date().getTime() - TOTPPeriod * 3 * 1000;
-  const hash = sha256(`${token}${client_id}${token}`);
-  const { results } = (await env.DB.prepare(selectTOTPToken).bind(deadline, hash, TOTPUsageLimit).all()) as Array<NTokenBackend>;
+  const deadline = new Date().getTime() - TokenPeriod * 3 * 1000;
+  const hash = sha256(`${client_id}${token}`);
+  const { results } = (await env.DB.prepare(selectTOTPToken).bind(deadline, hash, TokenUsageLimit).all()) as Array<NTokenBackend>;
   if (results.length > 0) {
     return false;
   } else {

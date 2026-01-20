@@ -56,10 +56,9 @@ export const headers = {
   'Access-Control-Allow-Headers': '*'
 };
 
-export const TOTPSecretSize = 32;
-export const TOTPDigits = 8;
-export const TOTPPeriod = 10;
-export const TOTPUsageLimit = 5;
+export const SecretSize = 64;
+export const TokenPeriod = 10;
+export const TokenUsageLimit = 5;
 
 // Export a default object containing event handlers
 export default {

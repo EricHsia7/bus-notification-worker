@@ -1,4 +1,4 @@
-import { headers, NResponseRegister, TOTPSecretSize, Env } from './index';
+import { headers, NResponseRegister, SecretSize, Env } from './index';
 import { addClient, initializeDB } from './database';
 import { generateIdentifier, generateSecret, sha256 } from './tools';
 
@@ -6,7 +6,7 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
   const reqHash = requestBody.hash;
 
   const clientID = generateIdentifier('client');
-  const TOTPSecret = generateSecret(TOTPSecretSize);
+  const TOTPSecret = generateSecret(SecretSize);
 
   const currentDate = new Date();
   currentDate.setMilliseconds(0);

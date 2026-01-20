@@ -25,7 +25,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
         method: 'cancel'
       };
     } else {
-      const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID });
+      const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID }, now.getTime());
       if (validation) {
         await recordTOTPToken(reqClientID, reqToken, env);
         const check = await checkToken(reqClientID, reqToken, env);

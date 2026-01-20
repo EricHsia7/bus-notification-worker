@@ -1,4 +1,5 @@
-import { NTokenBackend } from './database';
+import { NClientBackend } from './database';
+import { TokenPeriod } from './index';
 
 export const sha256 = require('sha256');
 
@@ -21,13 +22,12 @@ export function generateSecret(size: number): string {
   return result;
 }
 
-export function validateToken(client_id: NTokenBackend['ClientID'], token: NTokenBackend['Token'], payload: object): boolean {
-  const window = 10 * 1000;
-  const now = new Date().getTime();
+export function validateToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], token: string, payload: object, now: number): boolean {
+  const window = TokenPeriod * 1000;
   const i = (now - (now % window)) / window;
-  const previousToken = sha256(`${client_id} ${secret} ${i - 1} ${JSON.stringify(payload)}`);
-  const currentToken = sha256(`${client_id} ${secret} ${i} ${JSON.stringify(payload)}`);
-  const nextToken = sha256(`${client_id} ${secret} ${i + 1} ${JSON.stringify(payload)}`);
+  const previousToken = sha256(`${client_id} ${secret} ${(i - 1).toString(16)} ${JSON.stringify(payload)}`);
+  const currentToken = sha256(`${client_id} ${secret} ${i.toString(16)} ${JSON.stringify(payload)}`);
+  const nextToken = sha256(`${client_id} ${secret} ${(i + 1).toString(16)} ${JSON.stringify(payload)}`);
   if (currentToken === token || previousToken === token || nextToken === token) {
     return true;
   } else {

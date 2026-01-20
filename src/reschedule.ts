@@ -27,7 +27,17 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
         method: 'reschedule'
       };
     } else {
-      const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID, estimate_time: reqEstimateTime, scheduled_time: reqScheduledTime });
+      const validation = validateToken(
+        thisClient.ClientID,
+        thisClient.Secret,
+        reqToken,
+        {
+          schedule_id: reqScheduleID,
+          estimate_time: reqEstimateTime,
+          scheduled_time: reqScheduledTime
+        },
+        now.getTime()
+      );
       if (validation) {
         await recordTOTPToken(reqClientID, reqToken, env);
         const check = await checkToken(reqClientID, reqToken, env);
