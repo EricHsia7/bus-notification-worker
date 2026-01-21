@@ -111,7 +111,7 @@ export async function recordToken(client_id: NClientBackend['ClientID'], token: 
   const insertToken = `INSERT OR IGNORE INTO "${TokenTableName}" ("Hash", "ClientID", "Token", "TimeStamp") VALUES (?, ?, ?, ?);`;
   const updateToken = `UPDATE "${TokenTableName}" SET "Count" = "Count" + 1 WHERE Hash = ?;`;
   const timeStamp = new Date().getTime();
-  const hash = sha512(`${token}${client_id}${token}`);
+  const hash = sha512(`${sha512(client_id)}${sha512(token)}`);
   await env.DB.prepare(insertToken).bind(hash, client_id, token, timeStamp).run();
   await env.DB.prepare(updateToken).bind(hash).run();
 }
@@ -125,7 +125,7 @@ export async function discardExpiredToken(now: number, env: Env) {
 export async function checkToken(client_id: NTokenBackend['ClientID'], token: NTokenBackend['Token'], env: Env): Promise<boolean> {
   const selectToken = `SELECT "Count" FROM "${TokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count >= ?`;
   const deadline = new Date().getTime() - TokenPeriod * 3 * 1000;
-  const hash = sha512(`${client_id}${token}`);
+  const hash = sha512(`${sha512(client_id)}${sha512(token)}`);
   const { results } = (await env.DB.prepare(selectToken).bind(deadline, hash, TokenUsageLimit).all()) as Array<NTokenBackend>;
   if (results.length > 0) {
     return false;
