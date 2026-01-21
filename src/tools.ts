@@ -22,12 +22,16 @@ export function generateSecret(size: number): string {
   return result;
 }
 
+function getToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], payload: object, i: number): string {
+  return sha512(sha512(`${client_id}\n${secret}\n${i}\n${sha512(`${client_id}\n${secret}\n${sha512(JSON.stringify(payload))}`)}`));
+}
+
 export function validateToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], token: string, payload: object, now: number): boolean {
   const window = TokenPeriod * 1000;
   const i = (now - (now % window)) / window;
-  const previousToken = sha512(sha512(`${client_id} ${secret} ${(i - 1).toString(16)} ${sha512(JSON.stringify(payload))}`));
-  const currentToken = sha512(sha512(`${client_id} ${secret} ${i.toString(16)} ${sha512(JSON.stringify(payload))}`));
-  const nextToken = sha512(sha512(`${client_id} ${secret} ${(i + 1).toString(16)} ${sha512(JSON.stringify(payload))}`));
+  const previousToken = getToken(client_id, secret, payload, i - 1);
+  const currentToken = getToken(client_id, secret, payload, i);
+  const nextToken = getToken(client_id, secret, payload, i + 1);
   if (currentToken === token || previousToken === token || nextToken === token) {
     return true;
   } else {
