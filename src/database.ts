@@ -123,7 +123,7 @@ export async function discardExpiredToken(now: number, env: Env) {
 }
 
 export async function checkToken(client_id: NTokenBackend['ClientID'], token: NTokenBackend['Token'], env: Env): Promise<boolean> {
-  const selectToken = `SELECT "Count" FROM "${TokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count >= ?`;
+  const selectToken = `SELECT "Count" FROM "${TokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count > ?`;
   const deadline = new Date().getTime() - TokenPeriod * 3 * 1000;
   const hash = sha512(`${sha512(client_id)}${sha512(token)}`);
   const { results } = (await env.DB.prepare(selectToken).bind(deadline, hash, TokenUsageLimit).all()) as Array<NTokenBackend>;
