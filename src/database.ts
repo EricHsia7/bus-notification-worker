@@ -118,7 +118,7 @@ export async function recordToken(client_id: NClientBackend['ClientID'], token: 
 
 export async function discardExpiredToken(now: number, env: Env) {
   const deleteToken = `DELETE FROM "${TokenTableName}" WHERE TimeStamp < ?`;
-  const deadline = now - TokenPeriod * 5 * 1000;
+  const deadline = now - TokenPeriod * 3 * 1000;
   await env.DB.prepare(deleteToken).bind(deadline).run();
 }
 
