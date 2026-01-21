@@ -118,13 +118,13 @@ export async function recordToken(client_id: NClientBackend['ClientID'], token: 
 
 export async function discardExpiredToken(now: number, env: Env) {
   const deleteToken = `DELETE FROM "${TokenTableName}" WHERE TimeStamp < ?`;
-  const deadline = now - TokenPeriod * 3 * 1000;
+  const deadline = now - TokenPeriod * 5 * 1000;
   await env.DB.prepare(deleteToken).bind(deadline).run();
 }
 
 export async function checkToken(client_id: NTokenBackend['ClientID'], token: NTokenBackend['Token'], env: Env): Promise<boolean> {
   const selectToken = `SELECT "Count" FROM "${TokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count > ?`;
-  const deadline = new Date().getTime() - TokenPeriod * 3 * 1000;
+  const deadline = new Date().getTime() - TokenPeriod * 5 * 1000;
   const hash = sha512(`${sha512(client_id)}${sha512(token)}`);
   const { results } = (await env.DB.prepare(selectToken).bind(deadline, hash, TokenUsageLimit).all()) as Array<NTokenBackend>;
   if (results.length > 0) {
