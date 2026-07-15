@@ -40,7 +40,7 @@ export function validateToken(client_id: NClientBackend['ClientID'], secret: NCl
 }
 
 export function generateIdentifier(prefix = 'bus'): string {
-  const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = `${prefix}_`;
   const length = 32;
   for (let i = 0; i < length; i++) {
