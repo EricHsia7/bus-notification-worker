@@ -1,6 +1,6 @@
 {
   "name": "@erichsia7/bus-notification-worker",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "private": false,
   "main": "./src/index.ts",

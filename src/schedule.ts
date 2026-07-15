@@ -79,7 +79,8 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
           responseObject = {
             result: 'The token was used too many times.',
             code: 403,
-            method: 'schedule'
+            method: 'schedule',
+            schedule_id: 'null'
           };
         }
       } else {

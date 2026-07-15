@@ -10,7 +10,7 @@ export interface Env {
   DB: D1Database;
 }
 
-export type NResponseCode = 200 | 400 | 401 | 404 | 500;
+export type NResponseCode = 200 | 400 | 401 | 403 | 404 | 500;
 
 export interface NResponseCancel {
   result: string;
