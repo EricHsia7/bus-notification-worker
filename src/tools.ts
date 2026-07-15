@@ -39,7 +39,7 @@ export function validateToken(client_id: NClientBackend['ClientID'], secret: NCl
   }
 }
 
-export function generateIdentifier(prefix = 'bus') {
+export function generateIdentifier(prefix = 'bus'): string {
   const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
   let result = `${prefix}_`;
   const length = 32;
@@ -51,35 +51,33 @@ export function generateIdentifier(prefix = 'bus') {
 }
 
 export function formatTime(time: number, mode: number): string {
-  time = Math.round(time);
+  const roundedTime = time | 0;
   switch (mode) {
-    case 0:
-      return `${time}秒`;
-      break;
-    case 1:
-      var minutes = String((time - (time % 60)) / 60);
-      var seconds = String(time % 60);
-      return [minutes, seconds].map((u) => u.padStart(2, '0')).join(':');
-      break;
-    case 2:
-      var minutes = String(Math.floor(time / 60));
+    case 0: {
+      return `${roundedTime}秒`;
+    }
+    case 1: {
+      const minutes = (roundedTime - (roundedTime % 60)) / 60;
+      const seconds = roundedTime % 60;
+      return `${minutes < 10 ? '0' : ''}${minutes.toString()}:${seconds < 10 ? '0' : ''}${seconds.toString()}`;
+    }
+    case 2: {
+      const minutes = (roundedTime / 60) | 0;
       return `${minutes}分`;
-      break;
-    case 3:
-      if (time >= 60 * 60) {
-        var hours = String(parseFloat((time / (60 * 60)).toFixed(1)));
+    }
+    case 3: {
+      if (60 * 60 <= roundedTime) {
+        const hours = parseFloat((roundedTime / (60 * 60)).toFixed(1));
         return `${hours}時`;
-      }
-      if (60 <= time && time < 60 * 60) {
-        var minutes = String(Math.floor(time / 60));
+      } else if (60 <= roundedTime) {
+        const minutes = (roundedTime / 60) | 0;
         return `${minutes}分`;
+      } else {
+        return `${roundedTime}秒`;
       }
-      if (time < 60) {
-        return `${time}秒`;
-      }
-      break;
-    default:
+    }
+    default: {
       return '--';
-      break;
+    }
   }
 }

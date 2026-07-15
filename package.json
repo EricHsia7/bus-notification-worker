@@ -1,6 +1,6 @@
 {
   "name": "@erichsia7/bus-notification-worker",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "private": false,
   "main": "./src/index.ts",
@@ -11,17 +11,19 @@
     "type": "git",
     "url": "https://github.com/EricHsia7/bus-notification-worker.git"
   },
-  "keywords": ["bus-notification-worker"],
+  "keywords": [
+    "bus-notification-worker"
+  ],
   "author": "EricHsia7",
   "bugs": {
     "url": "https://github.com/erichsia7/bus-notification-worker/issues"
   },
   "homepage": "https://erichsia7.github.io/bus-notification-worker/",
   "devDependencies": {
-    "wrangler": "^4.59.2",
-    "@cloudflare/workers-types": "^4.20260120.0"
+    "wrangler": "4.111.0",
+    "@cloudflare/workers-types": "5.20260715.1"
   },
   "dependencies": {
-    "js-sha512": "^0.9.0"
+    "js-sha512": "0.9.0"
   }
 }
