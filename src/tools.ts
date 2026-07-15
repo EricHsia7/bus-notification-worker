@@ -4,6 +4,8 @@ import { TokenPeriod } from './index';
 export const { sha512 } = require('js-sha512');
 
 export function generateSecret(size: number): string {
+  const bytes = new Uint8Array(size);
+  crypto.getRandomValues(bytes);
   const CHARSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   const BASE = 62n;
 
@@ -11,7 +13,7 @@ export function generateSecret(size: number): string {
   let result = '';
   for (let i = size - 1; i >= 0; i--) {
     // Shift the current result left by 8 bits and add the new byte
-    const byte = Math.floor(Math.random() * 255);
+    const byte = bytes[i];
     num = (num << 8n) + BigInt(byte);
   }
   while (num > 0n) {
@@ -39,12 +41,14 @@ export function validateToken(client_id: NClientBackend['ClientID'], secret: NCl
   }
 }
 
-export function generateIdentifier(prefix = 'bus'): string {
-  const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+export function generateIdentifier(prefix: string = ''): string {
+  const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-';
   let result = `${prefix}_`;
   const length = 32;
+  const seed = new Uint32Array(length);
+  crypto.getRandomValues(seed);
   for (let i = 0; i < length; i++) {
-    const randomNumber = Math.floor(Math.random() * characterSet.length);
+    const randomNumber = Math.floor((seed[i] / (2 ** 32 - 1)) * characterSet.length);
     result += characterSet.substring(randomNumber, randomNumber + 1);
   }
   return result;
