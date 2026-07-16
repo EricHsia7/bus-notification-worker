@@ -48,13 +48,13 @@ export interface NResponseReschedule {
 
 export type NResponse = NResponseCancel | NResponseRegister | NResponseSchedule | NResponseRotate | NResponseReschedule;
 
-export function getHeaders(origin: any): object {
+export function getHeaders(origin: any) {
   return {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': typeof origin === 'string' ? origin : '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Credentials': false,
+    'Access-Control-Allow-Credentials': 'false',
     'Access-Control-Allow-Headers': '*',
     'Vary': 'Origin'
   };

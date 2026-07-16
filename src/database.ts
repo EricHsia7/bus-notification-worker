@@ -89,7 +89,7 @@ export async function addClient(client_id: NClientBackend['ClientID'], secret: N
 
 export async function getClient(client_id: NClientBackend['ClientID'], env: Env): Promise<NClientBackend | false> {
   const selectClient = `SELECT * FROM "${ClientTableName}" WHERE ClientID = ?;`;
-  const { results } = (await env.DB.prepare(selectClient).bind(client_id).all()) as Array<NClientBackend>;
+  const { results } = (await env.DB.prepare(selectClient).bind(client_id).all()) as { results: Array<NClientBackend> };
   if (results.length > 0) {
     return results[0];
   } else {
@@ -126,7 +126,7 @@ export async function checkToken(client_id: NTokenBackend['ClientID'], token: NT
   const selectToken = `SELECT "Count" FROM "${TokenTableName}" WHERE TimeStamp >= ? AND Hash = ? AND Count > ?`;
   const deadline = new Date().getTime() - TokenPeriod * 5 * 1000;
   const hash = sha512(`${sha512(client_id)}${sha512(token)}`);
-  const { results } = (await env.DB.prepare(selectToken).bind(deadline, hash, TokenUsageLimit).all()) as Array<NTokenBackend>;
+  const { results } = (await env.DB.prepare(selectToken).bind(deadline, hash, TokenUsageLimit).all()) as { results: Array<NTokenBackend> };
   if (results.length > 0) {
     return false;
   } else {
@@ -158,7 +158,7 @@ VALUES
 
 export async function getSchedule(schedule_id: NScheduleBackend['ScheduleID'], client_id: NScheduleBackend['ClientID'], env: Env): Promise<NScheduleBackend | false> {
   const selectSchedule = `SELECT * FROM "${ScheduleTableName}" WHERE ScheduleID = ? AND ClientID = ?`;
-  const { results } = (await env.DB.prepare(selectSchedule).bind(schedule_id, client_id).all()) as Array<NScheduleBackend>;
+  const { results } = (await env.DB.prepare(selectSchedule).bind(schedule_id, client_id).all()) as { results: Array<NScheduleBackend> };
   if (results.length > 0) {
     return results[0];
   } else {
@@ -182,12 +182,12 @@ export async function discardSchedule(schedule_id: NScheduleBackend['ScheduleID'
 
 export async function listSchedules(deadline: number, env: Env): Promise<Array<NScheduleBackend>> {
   const selectSchedule = `SELECT * FROM "${ScheduleTableName}" WHERE ScheduledTime <= ?`;
-  const { results } = (await env.DB.prepare(selectSchedule).bind(deadline).all()) as Array<NScheduleBackend>;
+  const { results } = (await env.DB.prepare(selectSchedule).bind(deadline).all()) as { results: Array<NScheduleBackend> };
   return results;
 }
 
 export async function discardExpiredSchedules(deadline: number, env: Env) {
   const deleteSchedule = `DELETE FROM "${ScheduleTableName}" WHERE ScheduledTime <= ?`;
-  const { results } = (await env.DB.prepare(deleteSchedule).bind(deadline).all()) as Array<NScheduleBackend>;
+  const { results } = (await env.DB.prepare(deleteSchedule).bind(deadline).all()) as { results: Array<NScheduleBackend> };
   return results;
 }
