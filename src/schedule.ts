@@ -121,7 +121,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
   return new Response(
     JSON.stringify({
       result: 'The notification was scheduled.',
-      code: 200,
+      code: 0,
       method: 'schedule',
       schedule_id: scheduleID
     } as NResponseSchedule),

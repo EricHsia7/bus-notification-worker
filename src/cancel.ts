@@ -106,7 +106,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'A notification can only be canceled before it was due.',
-        code: 400,
+        code: 6,
         method: 'cancel'
       } as NResponseCancel),
       {
@@ -120,7 +120,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
   return new Response(
     JSON.stringify({
       result: 'The notification was canceled.',
-      code: 200,
+      code: 0,
       method: 'cancel'
     } as NResponseCancel),
     {
