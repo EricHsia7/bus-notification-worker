@@ -18,46 +18,42 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
   const envHash_current = sha512(`${sha512(env.REGISTRATION_KEY)}${currentDate.getTime()}`);
   const envHash_next = sha512(`${sha512(env.REGISTRATION_KEY)}${currentDate.getTime() + 60 * 1000}`);
 
-  let responseObject: NResponseRegister = {
-    result: 'There was an unknown error.',
-    code: 500,
-    method: 'register',
-    client_id: 'null',
-    secret: 'null'
-  };
+  if (String(env.ALLOW_REGISTRATION).toLowerCase() !== 'true') {
+    return new Response(JSON.stringify({ result: 'The registration is not allowed at this moment.', code: 403, method: 'register', client_id: 'null', secret: 'null' }), {
+      status: 200,
+      headers: getHeaders(origin)
+    });
+  }
 
-  if (String(env.ALLOW_REGISTRATION).toLowerCase() === 'true') {
-    if (reqHash === envHash_previous || reqHash === envHash_current || reqHash === envHash_next) {
-      await initializeDB(env);
-      await addClient(clientID, secret, env);
-      responseObject = {
+  if (reqHash === envHash_previous || reqHash === envHash_current || reqHash === envHash_next) {
+    await initializeDB(env);
+    await addClient(clientID, secret, env);
+    return new Response(
+      JSON.stringify({
         result: 'Client was registered.',
-        code: 200,
+        code: 0,
         method: 'register',
         client_id: clientID,
         secret: secret
-      };
-    } else {
-      responseObject = {
-        result: 'The hash is not valid.',
-        code: 400,
-        method: 'register',
-        client_id: 'null',
-        secret: 'null'
-      };
-    }
-  } else {
-    responseObject = {
-      result: 'The registration is not allowed at this moment.',
-      code: 403,
+      } as NResponseRegister),
+      {
+        status: 200,
+        headers: getHeaders(origin)
+      }
+    );
+  }
+
+  return new Response(
+    JSON.stringify({
+      result: 'The hash is not valid.',
+      code: 1,
       method: 'register',
       client_id: 'null',
       secret: 'null'
-    };
-  }
-
-  return new Response(JSON.stringify(responseObject), {
-    status: 200,
-    headers: getHeaders(origin)
-  });
+    } as NResponseRegister),
+    {
+      status: 200,
+      headers: getHeaders(origin)
+    }
+  );
 }

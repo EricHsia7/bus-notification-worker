@@ -24,7 +24,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
     return new Response(
       JSON.stringify({
         result: 'The client id is invalid.',
-        code: 400,
+        code: 1,
         method: 'schedule',
         schedule_id: 'null'
       } as NResponseSchedule),
@@ -40,7 +40,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
     return new Response(
       JSON.stringify({
         result: 'The client was not found.',
-        code: 404,
+        code: 3,
         method: 'schedule',
         schedule_id: 'null'
       } as NResponseSchedule),
@@ -73,7 +73,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
     return new Response(
       JSON.stringify({
         result: 'The request was unauthorized.',
-        code: 403,
+        code: 5,
         method: 'schedule',
         schedule_id: 'null'
       } as NResponseSchedule),
@@ -90,7 +90,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
     return new Response(
       JSON.stringify({
         result: 'The token was used too many times.',
-        code: 403,
+        code: 5,
         method: 'schedule',
         schedule_id: 'null'
       } as NResponseSchedule),
@@ -105,7 +105,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
     return new Response(
       JSON.stringify({
         result: 'The scheduled time shall be at least 1 minute after.',
-        code: 400,
+        code: 6,
         method: 'schedule',
         schedule_id: 'null'
       } as NResponseSchedule),

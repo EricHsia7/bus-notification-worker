@@ -16,7 +16,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The client id is invalid.',
-        code: 400,
+        code: 1,
         method: 'cancel'
       } as NResponseCancel),
       {
@@ -31,7 +31,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The client was not found.',
-        code: 404,
+        code: 3,
         method: 'cancel'
       } as NResponseCancel),
       {
@@ -46,7 +46,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The request was unauthorized.',
-        code: 403,
+        code: 5,
         method: 'cancel'
       } as NResponseCancel),
       {
@@ -62,7 +62,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The token was used too many times.',
-        code: 403,
+        code: 5,
         method: 'cancel'
       } as NResponseCancel),
       {
@@ -77,7 +77,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The schedule id is invalid.',
-        code: 400,
+        code: 2,
         method: 'cancel'
       } as NResponseCancel),
       {
@@ -92,7 +92,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The schedule was not found.',
-        code: 404,
+        code: 4,
         method: 'cancel'
       } as NResponseCancel),
       {

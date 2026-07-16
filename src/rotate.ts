@@ -15,7 +15,7 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The client id is invalid.',
-        code: 400,
+        code: 1,
         method: 'rotate',
         secret: 'null'
       } as NResponseRotate),
@@ -31,7 +31,7 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The client was not found.',
-        code: 404,
+        code: 3,
         method: 'rotate',
         secret: 'null'
       } as NResponseRotate),
@@ -47,7 +47,7 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The request was unauthorized.',
-        code: 403,
+        code: 5,
         method: 'rotate',
         secret: 'null'
       } as NResponseRotate),
@@ -64,7 +64,7 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The token was used too many times.',
-        code: 403,
+        code: 5,
         method: 'rotate',
         secret: 'null'
       } as NResponseRotate),
@@ -80,7 +80,7 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
   return new Response(
     JSON.stringify({
       result: 'The secret was rotated.',
-      code: 200,
+      code: 0,
       method: 'rotate',
       secret: secret
     } as NResponseRotate),

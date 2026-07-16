@@ -10,7 +10,16 @@ export interface Env {
   DB: D1Database;
 }
 
-export type NResponseCode = 200 | 400 | 401 | 403 | 404 | 500;
+/**
+ * 0: success;
+ * 1: invalid client id;
+ * 2: invalid schedule id;
+ * 3: client not found;
+ * 4: schedule not found;
+ * 5: authentication failure;
+ * 6: schedule time error
+ */
+export type NResponseCode = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface NResponseCancel {
   result: string;
@@ -80,23 +89,18 @@ export default {
         case 'register':
           const registration = await register(request, requestBody, env, ctx);
           return registration;
-          break;
         case 'schedule':
           const scheduling = await schedule(request, requestBody, env, ctx);
           return scheduling;
-          break;
         case 'cancel':
           const cancellation = await cancel(request, requestBody, env, ctx);
           return cancellation;
-          break;
         case 'rotate':
           const rotation = await rotate(request, requestBody, env, ctx);
           return rotation;
-          break;
         case 'reschedule':
           const rescheduling = await reschedule(request, requestBody, env, ctx);
           return rescheduling;
-          break;
         default:
           return new Response(
             JSON.stringify({
@@ -109,7 +113,6 @@ export default {
               headers: getHeaders(origin)
             }
           );
-          break;
       }
     } else {
       return new Response(

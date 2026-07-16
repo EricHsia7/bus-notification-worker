@@ -18,7 +18,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     return new Response(
       JSON.stringify({
         result: 'The client id is invalid.',
-        code: 400,
+        code: 1,
         method: 'reschedule'
       } as NResponseReschedule),
       {
@@ -33,7 +33,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     return new Response(
       JSON.stringify({
         result: 'The client was not found.',
-        code: 404,
+        code: 3,
         method: 'reschedule'
       } as NResponseReschedule),
       {
@@ -58,7 +58,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     return new Response(
       JSON.stringify({
         result: 'The request was unauthorized.',
-        code: 403,
+        code: 5,
         method: 'reschedule'
       } as NResponseReschedule),
       {
@@ -74,7 +74,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     return new Response(
       JSON.stringify({
         result: 'The token was used too many times.',
-        code: 403,
+        code: 5,
         method: 'reschedule'
       } as NResponseReschedule),
       {
@@ -89,7 +89,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     return new Response(
       JSON.stringify({
         result: 'The schedule id is invalid.',
-        code: 400,
+        code: 2,
         method: 'reschedule'
       } as NResponseReschedule),
       {
@@ -104,7 +104,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     return new Response(
       JSON.stringify({
         result: 'The schedule was not found.',
-        code: 404,
+        code: 4,
         method: 'reschedule'
       } as NResponseReschedule),
       {
@@ -118,7 +118,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     return new Response(
       JSON.stringify({
         result: 'A notification can only be rescheduled before it was due.',
-        code: 400,
+        code: 6,
         method: 'reschedule'
       } as NResponseReschedule),
       {
@@ -132,7 +132,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
   return new Response(
     JSON.stringify({
       result: 'The notification was rescheduled.',
-      code: 200,
+      code: 0,
       method: 'reschedule'
     } as NResponseReschedule),
     {
