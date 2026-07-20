@@ -137,7 +137,6 @@ export async function checkToken(client_id: NTokenBackend['ClientID'], token: NT
   const deadline = new Date().getTime() - TokenPeriod * 5 * 1000;
   const hash = sha512(`${sha512(client_id)}${sha512(token)}`);
   const { results } = (await env.DB.prepare(selectToken).bind(deadline, hash, TokenUsageLimit).all()) as { results: Array<NTokenBackend> };
-  console.log(results, results.length);
   if (results.length > 0) {
     return false;
   } else {
