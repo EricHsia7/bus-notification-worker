@@ -55,7 +55,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
     return new Response(
       JSON.stringify({
         result: 'The origin is invalid.',
-        code: 3,
+        code: 5,
         method: 'schedule',
         schedule_id: 'null'
       } as NResponseSchedule),

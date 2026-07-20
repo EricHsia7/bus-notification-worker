@@ -45,7 +45,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     return new Response(
       JSON.stringify({
         result: 'The origin is invalid.',
-        code: 3,
+        code: 5,
         method: 'cancel'
       } as NResponseCancel),
       {
