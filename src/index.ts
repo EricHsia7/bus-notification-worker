@@ -70,7 +70,7 @@ export function getHeaders(origin: any) {
 }
 
 export const SecretSize = 64;
-export const TokenPeriod = 5;
+export const TokenPeriod = 30;
 export const TokenUsageLimit = 1;
 
 // Export a default object containing event handlers
