@@ -1,4 +1,4 @@
-import { checkToken, ClientIDRegularExpression, getClient, getSchedule, modifySchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordToken, ScheduleIDRegularExpression } from './database';
+import { checkToken, testClientID, getClient, getSchedule, modifySchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordToken, testScheduleID } from './database';
 import { getHeaders, NResponseReschedule } from './index';
 import { validateToken } from './tools';
 
@@ -13,7 +13,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
 
   const now = new Date();
 
-  const clientIDTest = ClientIDRegularExpression().test(reqClientID);
+  const clientIDTest = testClientID(reqClientID);
   if (!clientIDTest) {
     return new Response(
       JSON.stringify({
@@ -99,7 +99,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     );
   }
 
-  const scheduleIDTest = ScheduleIDRegularExpression().test(reqScheduleID);
+  const scheduleIDTest = testScheduleID(reqScheduleID);
   if (!scheduleIDTest) {
     return new Response(
       JSON.stringify({

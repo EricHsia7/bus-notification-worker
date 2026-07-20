@@ -10,8 +10,10 @@ const createClientTable = `CREATE TABLE IF NOT EXISTS "${ClientTableName}" (
   "TimeStamp" INTEGER NULL
 );`;
 
-export function ClientIDRegularExpression(): RegExp {
-  return /^(client_)([A-Za-z0-9\_\-]{32,32})$/m;
+export function testClientID(client_id: string): boolean {
+  if (typeof client_id !== 'string') return false;
+  if (!/^(client_)([A-Za-z0-9\_\-]{32,32})$/m.test(client_id)) return false;
+  return true;
 }
 // Gloab tag would result in altering test results because the worker is alive and does not restart every run
 
@@ -41,8 +43,10 @@ const createScheduleTable = `CREATE TABLE IF NOT EXISTS "${ScheduleTableName}" (
 );`;
 const createScheduleTableIndex = `CREATE INDEX IF NOT EXISTS "${ScheduleTableName}Index" ON "${ScheduleTableName}" (ScheduledTime ASC);`;
 
-export function ScheduleIDRegularExpression(): RegExp {
-  return /^(schedule_)([A-Za-z0-9\_\-]{32,32})$/m;
+export function testScheduleID(schedule_id: string): boolean {
+  if (typeof schedule_id !== 'string') return false;
+  if (!/^(schedule_)([A-Za-z0-9\_\-]{32,32})$/m.test(schedule_id)) return false;
+  return true;
 }
 
 export interface NScheduleBackend {

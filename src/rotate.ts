@@ -1,4 +1,4 @@
-import { checkToken, ClientIDRegularExpression, getClient, NClientBackend, NTokenBackend, recordToken, setClientSecret } from './database';
+import { checkToken, testClientID, getClient, NClientBackend, NTokenBackend, recordToken, setClientSecret } from './database';
 import { getHeaders, NResponseRotate, SecretSize } from './index';
 import { generateSecret, validateToken } from './tools';
 
@@ -10,7 +10,7 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
 
   const now = new Date();
 
-  const clientIDTest = ClientIDRegularExpression().test(reqClientID);
+  const clientIDTest = testClientID(reqClientID);
   if (!clientIDTest) {
     return new Response(
       JSON.stringify({

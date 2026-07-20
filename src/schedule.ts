@@ -1,4 +1,4 @@
-import { addSchedule, checkToken, ClientIDRegularExpression, getClient, NClientBackend, NScheduleBackend, NTokenBackend, recordToken } from './database';
+import { addSchedule, checkToken, testClientID, getClient, NClientBackend, NScheduleBackend, NTokenBackend, recordToken } from './database';
 import { getHeaders, NResponseSchedule } from './index';
 import { generateIdentifier, validateToken } from './tools';
 
@@ -19,7 +19,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
 
   const now = new Date();
 
-  const clientIDTest = ClientIDRegularExpression().test(reqClientID);
+  const clientIDTest = testClientID(reqClientID);
   if (!clientIDTest) {
     return new Response(
       JSON.stringify({

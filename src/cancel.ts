@@ -1,4 +1,4 @@
-import { checkToken, ClientIDRegularExpression, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordToken, ScheduleIDRegularExpression } from './database';
+import { checkToken, testClientID, discardSchedule, getClient, getSchedule, NClientBackend, NScheduleBackend, NTokenBackend, recordToken, testScheduleID } from './database';
 import { getHeaders, NResponseCancel } from './index';
 import { validateToken } from './tools';
 
@@ -11,7 +11,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
 
   const now = new Date();
 
-  const clientIDTest = ClientIDRegularExpression().test(reqClientID);
+  const clientIDTest = testClientID(reqClientID);
   if (!clientIDTest) {
     return new Response(
       JSON.stringify({
@@ -86,7 +86,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     );
   }
 
-  const scheduleIDTest = ScheduleIDRegularExpression().test(reqScheduleID);
+  const scheduleIDTest = testScheduleID(reqScheduleID);
   if (!scheduleIDTest) {
     return new Response(
       JSON.stringify({
