@@ -41,19 +41,19 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     );
   }
 
-  if (thisClient.Origin !== origin) {
-    return new Response(
-      JSON.stringify({
-        result: 'The origin is invalid.',
-        code: 5,
-        method: 'cancel'
-      } as NResponseCancel),
-      {
-        status: 200,
-        headers: getHeaders(origin)
-      }
-    );
-  }
+  // if (thisClient.Origin !== origin) {
+  //   return new Response(
+  //     JSON.stringify({
+  //       result: 'The origin is invalid.',
+  //       code: 5,
+  //       method: 'cancel'
+  //     } as NResponseCancel),
+  //     {
+  //       status: 200,
+  //       headers: getHeaders(origin)
+  //     }
+  //   );
+  // }
 
   const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID }, origin, now.getTime());
   if (!validation) {
