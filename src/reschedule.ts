@@ -83,7 +83,6 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     );
   }
 
-  await recordToken(reqClientID, reqToken, env);
   const check = await checkToken(reqClientID, reqToken, env);
   if (!check) {
     return new Response(
@@ -98,6 +97,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
       }
     );
   }
+  await recordToken(reqClientID, reqToken, env);
 
   const scheduleIDTest = testScheduleID(reqScheduleID);
   if (!scheduleIDTest) {

@@ -100,7 +100,6 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
     );
   }
 
-  await recordToken(reqClientID, reqToken, env);
   const check = await checkToken(reqClientID, reqToken, env);
   if (!check) {
     return new Response(
@@ -116,6 +115,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
       }
     );
   }
+  await recordToken(reqClientID, reqToken, env);
 
   if (reqScheduledTime <= now.getTime() + 60 * 1 * 1000) {
     return new Response(

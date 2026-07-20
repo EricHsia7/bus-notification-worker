@@ -70,7 +70,6 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     );
   }
 
-  await recordToken(reqClientID, reqToken, env);
   const check = await checkToken(reqClientID, reqToken, env);
   if (!check) {
     return new Response(
@@ -85,6 +84,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
       }
     );
   }
+  await recordToken(reqClientID, reqToken, env);
 
   const scheduleIDTest = testScheduleID(reqScheduleID);
   if (!scheduleIDTest) {
