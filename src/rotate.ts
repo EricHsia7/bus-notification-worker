@@ -58,6 +58,21 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
     );
   }
 
+  if (thisClient.Origin !== origin) {
+    return new Response(
+      JSON.stringify({
+        result: 'The origin is invalid.',
+        code: 5,
+        method: 'rotate',
+        secret: 'null'
+      } as NResponseRotate),
+      {
+        status: 200,
+        headers: getHeaders(origin)
+      }
+    );
+  }
+
   await recordToken(reqClientID, reqToken, env);
   const check = await checkToken(reqClientID, reqToken, env);
   if (!check) {

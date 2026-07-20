@@ -51,6 +51,21 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
     );
   }
 
+  if (thisClient.Origin !== origin) {
+    return new Response(
+      JSON.stringify({
+        result: 'The origin is invalid.',
+        code: 3,
+        method: 'schedule',
+        schedule_id: 'null'
+      } as NResponseSchedule),
+      {
+        status: 200,
+        headers: getHeaders(origin)
+      }
+    );
+  }
+
   const validation = validateToken(
     thisClient.ClientID,
     thisClient.Secret,

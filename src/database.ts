@@ -6,6 +6,7 @@ const createClientTable = `CREATE TABLE IF NOT EXISTS "${ClientTableName}" (
   "Number" INTEGER PRIMARY KEY,
   "ClientID" TEXT UNIQUE,
   "Secret" TEXT NULL,
+  "Origin" TEXT NULL,
   "TimeStamp" INTEGER NULL
 );`;
 
@@ -16,6 +17,7 @@ export interface NClientBackend {
   Number: number;
   ClientID: string;
   Secret: string;
+  Origin: string;
   TimeStamp: number;
 }
 
@@ -81,10 +83,10 @@ export async function initializeDB(env: Env) {
   await env.DB.prepare(createToken).run();
 }
 
-export async function addClient(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], env: Env) {
-  const insertClient = `INSERT INTO "${ClientTableName}" ("ClientID", "Secret", "TimeStamp") VALUES (?, ?, ?);`;
+export async function addClient(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], origin: string, env: Env) {
+  const insertClient = `INSERT INTO "${ClientTableName}" ("ClientID", "Secret", "Origin", "TimeStamp") VALUES (?, ?, ?, ?);`;
   const timeStamp = new Date().getTime();
-  await env.DB.prepare(insertClient).bind(client_id, secret, timeStamp).run();
+  await env.DB.prepare(insertClient).bind(client_id, secret, origin, timeStamp).run();
 }
 
 export async function getClient(client_id: NClientBackend['ClientID'], env: Env): Promise<NClientBackend | false> {

@@ -14,20 +14,29 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
   currentDate.setMilliseconds(0);
   currentDate.setSeconds(0);
 
-  const envHash_previous = sha512(`${sha512(env.REGISTRATION_KEY)}${currentDate.getTime() - 60 * 1000}`);
-  const envHash_current = sha512(`${sha512(env.REGISTRATION_KEY)}${currentDate.getTime()}`);
-  const envHash_next = sha512(`${sha512(env.REGISTRATION_KEY)}${currentDate.getTime() + 60 * 1000}`);
+  const envHash_previous = sha512(`${sha512(origin)}${sha512(env.REGISTRATION_KEY)}${currentDate.getTime() - 60 * 1000}`);
+  const envHash_current = sha512(`${sha512(origin)}${sha512(env.REGISTRATION_KEY)}${currentDate.getTime()}`);
+  const envHash_next = sha512(`${sha512(origin)}${sha512(env.REGISTRATION_KEY)}${currentDate.getTime() + 60 * 1000}`);
 
   if (String(env.ALLOW_REGISTRATION).toLowerCase() !== 'true') {
-    return new Response(JSON.stringify({ result: 'The registration is not allowed at this moment.', code: 403, method: 'register', client_id: 'null', secret: 'null' }), {
-      status: 200,
-      headers: getHeaders(origin)
-    });
+    return new Response(
+      JSON.stringify({
+        result: 'The registration is not allowed at this moment.',
+        code: 5,
+        method: 'register',
+        client_id: 'null',
+        secret: 'null'
+      } as NResponseRegister),
+      {
+        status: 200,
+        headers: getHeaders(origin)
+      }
+    );
   }
 
   if (reqHash === envHash_previous || reqHash === envHash_current || reqHash === envHash_next) {
     await initializeDB(env);
-    await addClient(clientID, secret, env);
+    await addClient(clientID, secret, origin, env);
     return new Response(
       JSON.stringify({
         result: 'Client was registered.',
@@ -46,7 +55,7 @@ export async function register(request, requestBody, env: Env, ctx): Promise<Res
   return new Response(
     JSON.stringify({
       result: 'The hash is not valid.',
-      code: 1,
+      code: 5,
       method: 'register',
       client_id: 'null',
       secret: 'null'

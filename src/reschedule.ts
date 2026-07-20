@@ -43,6 +43,20 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     );
   }
 
+  if (thisClient.Origin !== origin) {
+    return new Response(
+      JSON.stringify({
+        result: 'The origin is invalid.',
+        code: 5,
+        method: 'reschedule'
+      } as NResponseReschedule),
+      {
+        status: 200,
+        headers: getHeaders(origin)
+      }
+    );
+  }
+
   const validation = validateToken(
     thisClient.ClientID,
     thisClient.Secret,
