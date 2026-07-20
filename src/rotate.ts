@@ -42,7 +42,7 @@ export async function rotate(request, requestBody, env, ctx): Promise<Response> 
     );
   }
 
-  const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, {}, now.getTime());
+  const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, {}, origin, now.getTime());
   if (!validation) {
     return new Response(
       JSON.stringify({
