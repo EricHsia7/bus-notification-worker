@@ -19,7 +19,7 @@ export async function schedule(request, requestBody, env, ctx): Promise<Response
 
   const now = new Date();
 
-  const clientIDTest = ClientIDRegularExpression.test(reqClientID);
+  const clientIDTest = ClientIDRegularExpression().test(reqClientID);
   if (!clientIDTest) {
     return new Response(
       JSON.stringify({

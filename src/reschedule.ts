@@ -13,7 +13,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
 
   const now = new Date();
 
-  const clientIDTest = ClientIDRegularExpression.test(reqClientID);
+  const clientIDTest = ClientIDRegularExpression().test(reqClientID);
   if (!clientIDTest) {
     return new Response(
       JSON.stringify({
@@ -99,7 +99,7 @@ export async function reschedule(request, requestBody, env, ctx): Promise<Respon
     );
   }
 
-  const scheduleIDTest = ScheduleIDRegularExpression.test(reqScheduleID);
+  const scheduleIDTest = ScheduleIDRegularExpression().test(reqScheduleID);
   if (!scheduleIDTest) {
     return new Response(
       JSON.stringify({

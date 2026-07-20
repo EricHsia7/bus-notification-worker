@@ -11,7 +11,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
 
   const now = new Date();
 
-  const clientIDTest = ClientIDRegularExpression.test(reqClientID);
+  const clientIDTest = ClientIDRegularExpression().test(reqClientID);
   if (!clientIDTest) {
     return new Response(
       JSON.stringify({
@@ -86,7 +86,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     );
   }
 
-  const scheduleIDTest = ScheduleIDRegularExpression.test(reqScheduleID);
+  const scheduleIDTest = ScheduleIDRegularExpression().test(reqScheduleID);
   if (!scheduleIDTest) {
     return new Response(
       JSON.stringify({
