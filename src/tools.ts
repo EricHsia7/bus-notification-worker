@@ -24,17 +24,18 @@ export function generateSecret(size: number): string {
   return result;
 }
 
-function getToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], payload: object, origin: string, i: number): string {
-  const payloadHash = sha512(`${sha512(client_id)}\n${sha512(secret)}\n${sha512(JSON.stringify(payload))}\n${sha512(origin)}`);
-  return sha512(sha512(`${client_id}\n${secret}\n${i}\n${payloadHash}}`));
+function getToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], payload: object, i: number): string {
+  const payloadHash = sha512(`${sha512(client_id)}\n${sha512(secret)}\n${sha512(JSON.stringify(payload))}`);
+  const result = sha512(sha512(`${client_id}\n${secret}\n${i}\n${payloadHash}}`));
+  return result;
 }
 
-export function validateToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], token: string, payload: object, origin: string, now: number): boolean {
+export function validateToken(client_id: NClientBackend['ClientID'], secret: NClientBackend['Secret'], token: string, payload: object, now: number): boolean {
   const window = TokenPeriod * 1000;
   const i = (now - (now % window)) / window;
-  const previousToken = getToken(client_id, secret, payload, origin, i - 1);
-  const currentToken = getToken(client_id, secret, payload, origin, i);
-  const nextToken = getToken(client_id, secret, payload, origin, i + 1);
+  const previousToken = getToken(client_id, secret, payload, i - 1);
+  const currentToken = getToken(client_id, secret, payload, i);
+  const nextToken = getToken(client_id, secret, payload, i + 1);
   if (currentToken === token || previousToken === token || nextToken === token) {
     return true;
   } else {

@@ -55,7 +55,7 @@ export async function cancel(request, requestBody, env, ctx): Promise<Response> 
     );
   }
 
-  const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID }, origin, now.getTime());
+  const validation = validateToken(thisClient.ClientID, thisClient.Secret, reqToken, { schedule_id: reqScheduleID }, now.getTime());
   if (!validation) {
     return new Response(
       JSON.stringify({
